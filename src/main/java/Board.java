@@ -8,19 +8,38 @@ public class Board extends JPanel {
     private final int windowWidth = 720;
     private final Dimension windowSize = new Dimension(windowWidth, windowHeight);
 
+    //starting board state for testing
+    private final Piece[][] pieces = {
+            {new Rook(Cell.Colour.black), new Knight(Cell.Colour.black), new Bishop(Cell.Colour.black), new Queen(Cell.Colour.black),
+                    new King(Cell.Colour.black), new Bishop(Cell.Colour.black), new Knight(Cell.Colour.black), new Rook(Cell.Colour.black)},
+            {new Pawn(Cell.Colour.black), new Pawn(Cell.Colour.black), new Pawn(Cell.Colour.black), new Pawn(Cell.Colour.black),
+                    new Pawn(Cell.Colour.black), new Pawn(Cell.Colour.black), new Pawn(Cell.Colour.black), new Pawn(Cell.Colour.black)},
+            {null, null, null, null, null, null, null, null},
+            {null, null, null, null, null, null, null, null},
+            {null, null, null, null, null, null, null, null},
+            {null, null, null, null, null, null, null, null},
+            {new Pawn(Cell.Colour.white), new Pawn(Cell.Colour.white), new Pawn(Cell.Colour.white), new Pawn(Cell.Colour.white),
+                    new Pawn(Cell.Colour.white), new Pawn(Cell.Colour.white), new Pawn(Cell.Colour.white), new Pawn(Cell.Colour.white)},
+            {new Rook(Cell.Colour.white), new Knight(Cell.Colour.white), new Bishop(Cell.Colour.white), new Queen(Cell.Colour.white),
+                    new King(Cell.Colour.white), new Bishop(Cell.Colour.white), new Knight(Cell.Colour.white), new Rook(Cell.Colour.white)}
+    };
+
     public Board(){
         cells = new Cell[size][size];
         setLayout(new GridLayout(size, size, 0, 0));
 
-        Cell.CellColor color = Cell.CellColor.black;
+        Cell.Colour color = Cell.Colour.black;
         for(int y = 0; y < size; ++y){
             for(int x = 0; x < size; ++x){
                 Cell cell = new Cell(color);
-                cells[x][y] = cell;
+                cells[y][x] = cell;
                 add(cell);
 
+                if(pieces[y][x] != null)
+                    cell.setPiece(pieces[y][x]);
+
                 if(x != size - 1)
-                    color = color == Cell.CellColor.black ? Cell.CellColor.white : Cell.CellColor.black;
+                    color = color == Cell.Colour.black ? Cell.Colour.white : Cell.Colour.black;
             }
         }
 
@@ -32,8 +51,9 @@ public class Board extends JPanel {
     @Override
     protected void paintComponent(Graphics g) {
         for(int y = 0; y < size; ++y){
-            for(int x = 0; x < size; ++x)
-                cells[x][y].paint(g);
+            for(int x = 0; x < size; ++x) {
+                cells[y][x].paint(g);
+            }
         }
     }
 }
