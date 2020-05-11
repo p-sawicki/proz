@@ -33,5 +33,19 @@ public class King extends Piece{
             }
         }
         return false;
+
+    public ArrayList<Pair<Integer, Integer>> getPossibleMoves() {
+        ArrayList<Pair<Integer, Integer>> moves = new ArrayList<>();
+        int y = cell.getPosition().getKey();
+        int x = cell.getPosition().getValue();
+        moves.add(new Pair<>(y - 1, x - 1));
+        moves.add(new Pair<>(y - 1, x));
+        moves.add(new Pair<>(y - 1, x + 1));
+        moves.add(new Pair<>(y, x - 1));
+        moves.add(new Pair<>(y, x + 1));
+        moves.add(new Pair<>(y + 1, x - 1));
+        moves.add(new Pair<>(y + 1, x));
+        moves.add(new Pair<>(y + 1, x));
+        return trimPossibleMoves(moves);
     }
 }

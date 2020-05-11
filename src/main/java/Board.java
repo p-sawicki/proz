@@ -36,9 +36,9 @@ public class Board extends JPanel implements MouseListener {
         this.addMouseListener(this);
 
         Cell.Colour color = Cell.Colour.black;
-        for(int y = size - 1; y >= 0; --y) {
-            for(int x = 0; x < size; ++x) {
-                Cell cell = new Cell(color, this, new Point(x, y));
+        for(int y = 0; y < size; ++y){
+            for(int x = 0; x < size; ++x){
+                Cell cell = new Cell(color, this);
                 cells[y][x] = cell;
                 cell.board = this;
                 add(cell);
@@ -66,6 +66,14 @@ public class Board extends JPanel implements MouseListener {
         this.whiteTurn = !this.whiteTurn;
         String currentTurn = whiteTurn ? "White" : "Black";
         System.out.println(currentTurn + " turn");
+    }
+
+    public int getBoardSize() {
+        return size;
+    }
+
+    public Cell[][] getCells(){
+        return cells;
     }
 
     @Override
