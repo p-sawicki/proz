@@ -33,5 +33,18 @@ public class Knight extends Piece{
             }
         }
         return false;
+    public ArrayList<Pair<Integer, Integer>> getPossibleMoves() {
+        ArrayList<Pair<Integer, Integer>> moves = new ArrayList<>();
+        int y = cell.getPosition().getKey();
+        int x = cell.getPosition().getValue();
+        moves.add(new Pair<>(y - 2, x - 1));
+        moves.add(new Pair<>(y - 2, x + 1));
+        moves.add(new Pair<>(y - 1, x - 2));
+        moves.add(new Pair<>(y - 1, x + 2));
+        moves.add(new Pair<>(y + 1, x - 2));
+        moves.add(new Pair<>(y + 1, x + 2));
+        moves.add(new Pair<>(y + 2, x - 1));
+        moves.add(new Pair<>(y + 2, x + 1));
+        return trimPossibleMoves(moves);
     }
 }

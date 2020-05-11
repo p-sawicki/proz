@@ -22,8 +22,8 @@ public class Queen extends Piece{
         int moveX = Math.abs(desX - curX);
         int moveY = Math.abs(desY - curY);
 
-        if( (moveX == moveY) || (moveX == 0 && moveY > 0) || (moveX > 0 && moveY == 0) ) { // diagonal, vertical or horizontal move respectively
-            if(super.checkIfPathIsClear(super.cell, destination)){
+        if ((moveX == moveY) || (moveX == 0 && moveY > 0) || (moveX > 0 && moveY == 0)) { // diagonal, vertical or horizontal move respectively
+            if (super.checkIfPathIsClear(super.cell, destination)) {
                 if (!isOccupied) {
                     return true; //movePiece
                 } else {
@@ -34,5 +34,12 @@ public class Queen extends Piece{
             }
         }
         return false;
+    }
+    public ArrayList<Pair<Integer, Integer>> getPossibleMoves() {
+        ArrayList<Pair<Integer, Integer>> moves = new ArrayList<>();
+        moves.addAll(getHorizontalMoves());
+        moves.addAll(getVerticalMoves());
+        moves.addAll(getDiagonalMoves());
+        return moves;
     }
 }

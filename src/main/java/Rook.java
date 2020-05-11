@@ -22,8 +22,8 @@ public class Rook extends Piece{
         int moveX = Math.abs(desX - curX);
         int moveY = Math.abs(desY - curY);
 
-        if( (moveX == 0 && moveY > 0) || (moveX > 0 && moveY == 0) ) { // vertical or horizontal move
-            if(super.checkIfPathIsClear(super.cell, destination)) {
+        if ((moveX == 0 && moveY > 0) || (moveX > 0 && moveY == 0)) { // vertical or horizontal move
+            if (super.checkIfPathIsClear(super.cell, destination)) {
                 if (!isOccupied) {
                     return true; //movePiece
                 } else {
@@ -34,5 +34,11 @@ public class Rook extends Piece{
             }
         }
         return false;
+    }
+    public ArrayList<Pair<Integer, Integer>> getPossibleMoves() {
+        ArrayList<Pair<Integer, Integer>> moves = new ArrayList<>();
+        moves.addAll(getVerticalMoves());
+        moves.addAll(getHorizontalMoves());
+        return moves;
     }
 }

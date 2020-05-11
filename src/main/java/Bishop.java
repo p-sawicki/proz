@@ -1,6 +1,6 @@
 import java.awt.Point;
 
-public class Bishop extends Piece {
+public class Bishop extends Piece{
     public Bishop(Cell.Colour colour) {
         super(colour);
     }
@@ -34,5 +34,9 @@ public class Bishop extends Piece {
             }
         }
         return false;
+    }
+
+    public ArrayList<Pair<Integer, Integer>> getPossibleMoves() {
+        return getDiagonalMoves();
     }
 }

@@ -1,3 +1,5 @@
+import javafx.util.Pair;
+
 import javax.swing.*;
 import java.awt.*;
 
@@ -17,12 +19,12 @@ public class Cell extends JComponent {
         setBorder(BorderFactory.createEmptyBorder());
     }
 
-    public void setPiece(Piece piece){
+    public void setPiece(Piece piece) {
         this.piece = piece;
         piece.setCell(this);
     }
 
-    public void removePiece(){
+    public void removePiece() {
         piece = null;
     }
 
@@ -38,22 +40,34 @@ public class Cell extends JComponent {
         return this.getPiece() == null ? false : true;
     }
 
-    public void paint(Graphics g){
+    public void paint(Graphics g) {
         super.paintComponent(g);
 
-        if(colour == Colour.white)
+        if (colour == Colour.white)
             g.setColor(new Color(221, 192, 127));
         else
             g.setColor(new Color(101, 67, 33));
 
         g.fillRect(getX(), getY(), getWidth(), getHeight());
-        if(piece != null)
+        if (piece != null)
             piece.draw(g);
     }
 
-    public String getPieceNameColor(){
-        if(this.getPiece() != null)
+    public String getPieceNameColor() {
+        if (this.getPiece() != null)
             return this.getPiece().getColourAsString() + " " + this.getPiece().getName();
         return "";
+    }
+
+    public Board getBoard() {
+        return board;
+    }
+
+    public Piece getPiece() {
+        return piece;
+    }
+
+    public Pair<Integer, Integer> getPosition() {
+        return position;
     }
 }
