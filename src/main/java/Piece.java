@@ -37,7 +37,7 @@ public abstract class Piece {
 
     public abstract String getName();
 
-    public abstract boolean isAppropriateMove(Cell destination);
+    public abstract boolean isAppropriateMove(Cell destination); //checks if piece selected by player can be moved to selected cell
 
     public boolean checkIfPathIsClear(Cell start, Cell destinaltion){ // checks if cells between start and destionation are not occupied
         Pair<short, short> startPos = start.getPosition();

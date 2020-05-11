@@ -21,7 +21,7 @@ public class Pawn extends Piece{
 
         if(super.cell.piece.getColourAsString() == "White") {
             if (curX = desX) {
-                if ( (curY == 2 && desY == 4) && !isOccupied){ // pawn's first move
+                if ( (curY == 1 && desY == 3) && !isOccupied){ // pawn's first move
                     if(super.checkIfPathIsClear(super.cell, destination)) // there is no other piece between current pos and destination
                         //movePiece
                         return 1;
@@ -39,7 +39,7 @@ public class Pawn extends Piece{
         }
         if(super.cell.piece.getColourAsString() == "Black") {
             if (curX = desX) {
-                if ( (curY == 7 && desY == 5) && !isOccupied){ // pawn's first move
+                if ( (curY == 6 && desY == 4) && !isOccupied){ // pawn's first move
                     if(super.checkIfPathIsClear(super.cell, destination)) // there is no other piece between current pos and destination
                     //movePiece
                         return 1;
