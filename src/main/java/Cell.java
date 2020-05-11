@@ -5,7 +5,7 @@ public class Cell extends JComponent {
     private final Colour colour;
     private Piece piece;
     protected Board* boardptr;
-    Pair<short, short> position;
+    private Pair<int, int> position;
 
     public enum Colour {white, black}
 
@@ -24,18 +24,17 @@ public class Cell extends JComponent {
         return this.piece;
     }
 
-    public boolean getOccupation() {
-        return isOccupied = this.getPiece() == null ? 0 : 1;
+    public void setPosition(int x, int y){
+        this.position = new Pair<int, int>(x, y);
     }
 
-    public void setPosition(short x, short y){
-        this.position = new Pair<short, short>(x, y);
-    }
-
-    public Pair<short, short> getPosition() {
+    public Pair<int, int> getPosition() {
         return this.position;
     }
 
+    public boolean getOccupation() {
+        return isOccupied = this.getPiece() == null ? 0 : 1;
+    }
 
     public void paint(Graphics g){
         super.paintComponent(g);
