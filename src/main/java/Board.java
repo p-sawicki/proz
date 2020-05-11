@@ -8,6 +8,8 @@ public class Board extends JPanel {
     private final int windowWidth = 720;
     private final Dimension windowSize = new Dimension(windowWidth, windowHeight);
 
+    private boolean whiteTurn;
+
     //starting board state for testing
     private final Piece[][] pieces = {
             {new Rook(Cell.Colour.black), new Knight(Cell.Colour.black), new Bishop(Cell.Colour.black), new Queen(Cell.Colour.black),
@@ -33,6 +35,8 @@ public class Board extends JPanel {
             for(int x = 0; x < size; ++x){
                 Cell cell = new Cell(color);
                 cells[y][x] = cell;
+                cell.setPosition(x, y);
+                cell.boardptr = this;
                 add(cell);
 
                 if(pieces[y][x] != null)
@@ -46,6 +50,12 @@ public class Board extends JPanel {
         setMinimumSize(windowSize);
         setPreferredSize(windowSize);
         setSize(windowSize);
+
+        whiteTurn = 1;
+    }
+
+    public Cell[][] getCells() {
+        return cells;
     }
 
     @Override
