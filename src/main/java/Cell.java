@@ -4,6 +4,8 @@ import java.awt.*;
 public class Cell extends JComponent {
     private final Colour colour;
     private Piece piece;
+    protected Board* boardptr;
+    Pair<short, short> position;
 
     public enum Colour {white, black}
 
@@ -17,6 +19,27 @@ public class Cell extends JComponent {
         this.piece = piece;
         piece.setCell(this);
     }
+
+    public Piece getPiece() {
+        return this.piece;
+    }
+
+    public boolean getOccupation() {
+        return isOccupied = this.getPiece() == null ? 0 : 1;
+    }
+
+    public void setPosition(short x, short y){
+        this.position = new Pair<short, short>(x, y);
+    }
+
+    public Pair<short, short> getPosition() {
+        return this.position;
+    }
+
+    public Piece getPiece() {
+        return this.piece;
+    }
+
 
     public void paint(Graphics g){
         super.paintComponent(g);
