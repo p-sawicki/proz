@@ -36,10 +36,6 @@ public class Cell extends JComponent {
         return this.position;
     }
 
-    public Piece getPiece() {
-        return this.piece;
-    }
-
 
     public void paint(Graphics g){
         super.paintComponent(g);

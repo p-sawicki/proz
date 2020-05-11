@@ -1,7 +1,7 @@
 import javax.swing.*;
 import java.awt.*;
 
-public class Board extends JPanel {
+public class Board extends JPanel implements MouseListener {
     private final Cell[][] cells;
     private final int size = 8;
     private final int windowHeight = 720;
@@ -9,6 +9,7 @@ public class Board extends JPanel {
     private final Dimension windowSize = new Dimension(windowWidth, windowHeight);
 
     private boolean whiteTurn;
+    private Cell clickedCell;
 
     //starting board state for testing
     private final Piece[][] pieces = {
@@ -58,6 +59,10 @@ public class Board extends JPanel {
         return cells;
     }
 
+    public void switchTurn(){
+        this.whiteTurn = !this.whiteTurn;
+    }
+
     @Override
     protected void paintComponent(Graphics g) {
         for(int y = 0; y < size; ++y){
@@ -66,4 +71,52 @@ public class Board extends JPanel {
             }
         }
     }
+
+    public boolean moveIfPossible(Cell start, Cell destination){ // moves piece if not contradicted by rules
+        boolean moveable = start.piece.isAppropriateMove(start, destination);
+        if(moveable){
+            Piece movedPiece = start.piece;
+            start.piece = null;
+            //remove piece image from cell
+            destination.piece = movedPiece;
+            //add piece image to cell
+            return 1;
+        }
+        return 0;
+    }
+
+    @Override
+    public void mouseClicked(MouseEvent e){
+        Cell clicked = (Cell) getComponentAt(new Point(e.getX(), e.getY()));
+
+        if(clickedCell == null){ //player hasn't chosen cell to move yet
+            if(clicked.getOccupation() == 1){
+                if(clicked.getPiece().getColourAsString() == "White" && whiteTurn
+                    || clicked.getPiece().getColourAsString() == "Black" && !whiteTurn){
+                    this.clickedCell = clicked;
+                }
+            }
+        } else { // player clicked mouse when some cell is chosen
+            if(clicked.getOccupation() == 0){
+                boolean isMoved = moveIfPossible(clickedCell, clicked); //movePiece from clickedCell to clicked
+                this.clickedCell = null;
+            }
+            if(clicked.getOccupation() == 1){
+                if(clicked.getPiece().getColourAsString() == "White" && !whiteTurn
+                        || clicked.getPiece().getColourAsString() == "Black" && whiteTurn){
+                    boolean isMoved2 = moveIfPossible(clickedCell, clicked); //beat clicked with clickedCell
+                    this.clickedCell = null;
+                }
+                if(clicked.getPiece().getColourAsString() == "White" && whiteTurn
+                        || clicked.getPiece().getColourAsString() == "Black" && !whiteTurn){
+                    this.clickedCell = clicked;
+                }
+            }
+            if(isMoved || isMoved2){
+                switchTurn();
+                // check for checkmate situation
+            }
+        }
+    }
+
 }
