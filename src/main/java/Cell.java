@@ -1,5 +1,3 @@
-import javafx.util.Pair;
-
 import javax.swing.*;
 import java.awt.*;
 
@@ -21,7 +19,12 @@ public class Cell extends JComponent {
 
     public void setPiece(Piece piece) {
         this.piece = piece;
-        piece.setCell(this);
+        if(piece != null)
+            piece.setCell(this);
+    }
+
+    public void removePiece(){
+        piece = null;
     }
 
     public void removePiece() {
@@ -67,7 +70,7 @@ public class Cell extends JComponent {
         return piece;
     }
 
-    public Pair<Integer, Integer> getPosition() {
+    public Point getPosition() {
         return position;
     }
 }

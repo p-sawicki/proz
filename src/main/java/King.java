@@ -1,4 +1,5 @@
 import java.awt.Point;
+import java.util.ArrayList;
 
 public class King extends Piece{
     public King(Cell.Colour colour) {
@@ -22,30 +23,31 @@ public class King extends Piece{
         int moveX = Math.abs(desX - curX);
         int moveY = Math.abs(desY - curY);
 
-        if( (moveX + moveY == 1) || (moveX == 1 && moveY == 1) ){
-            if(!isOccupied) {
+        if ((moveX + moveY == 1) || (moveX == 1 && moveY == 1)) {
+            if (!isOccupied) {
                 return true; //movePiece
-            }
-            else{
-                if(super.getColourAsString() != destination.getPiece().getColourAsString()) {
+            } else {
+                if (super.getColourAsString() != destination.getPiece().getColourAsString()) {
                     return true; //movePiece to beat
                 }
             }
         }
         return false;
+    }
 
-    public ArrayList<Pair<Integer, Integer>> getPossibleMoves() {
-        ArrayList<Pair<Integer, Integer>> moves = new ArrayList<>();
-        int y = cell.getPosition().getKey();
-        int x = cell.getPosition().getValue();
-        moves.add(new Pair<>(y - 1, x - 1));
-        moves.add(new Pair<>(y - 1, x));
-        moves.add(new Pair<>(y - 1, x + 1));
-        moves.add(new Pair<>(y, x - 1));
-        moves.add(new Pair<>(y, x + 1));
-        moves.add(new Pair<>(y + 1, x - 1));
-        moves.add(new Pair<>(y + 1, x));
-        moves.add(new Pair<>(y + 1, x));
+    public ArrayList<Move> getPossibleMoves() {
+        ArrayList<Move> moves = new ArrayList<>();
+        int y = cell.getPosition().y;
+        int x = cell.getPosition().x;
+        Point start = cell.getPosition();
+        moves.add(Move.get(start, new Point(y - 1, x - 1)));
+        moves.add(Move.get(start, new Point(y - 1, x)));
+        moves.add(Move.get(start, new Point(y - 1, x + 1)));
+        moves.add(Move.get(start, new Point(y, x - 1)));
+        moves.add(Move.get(start, new Point(y, x + 1)));
+        moves.add(Move.get(start, new Point(y + 1, x - 1)));
+        moves.add(Move.get(start, new Point(y + 1, x)));
+        moves.add(Move.get(start, new Point(y + 1, x + 1)));
         return trimPossibleMoves(moves);
     }
 }

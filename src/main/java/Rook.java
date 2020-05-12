@@ -1,4 +1,5 @@
 import java.awt.Point;
+import java.util.ArrayList;
 
 public class Rook extends Piece{
     public Rook(Cell.Colour colour) {
@@ -35,8 +36,9 @@ public class Rook extends Piece{
         }
         return false;
     }
-    public ArrayList<Pair<Integer, Integer>> getPossibleMoves() {
-        ArrayList<Pair<Integer, Integer>> moves = new ArrayList<>();
+
+    public ArrayList<Move> getPossibleMoves() {
+        ArrayList<Move> moves = new ArrayList<>();
         moves.addAll(getVerticalMoves());
         moves.addAll(getHorizontalMoves());
         return moves;
