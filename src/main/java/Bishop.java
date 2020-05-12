@@ -36,7 +36,8 @@ public class Bishop extends Piece{
         return false;
     }
 
-    public ArrayList<Pair<Integer, Integer>> getPossibleMoves() {
+
+    public ArrayList<Move> getPossibleMoves() {
         return getDiagonalMoves();
     }
 }

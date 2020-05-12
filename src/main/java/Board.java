@@ -38,7 +38,7 @@ public class Board extends JPanel implements MouseListener {
         Cell.Colour color = Cell.Colour.black;
         for(int y = 0; y < size; ++y){
             for(int x = 0; x < size; ++x){
-                Cell cell = new Cell(color, this);
+                Cell cell = new Cell(color, this, new Point(y, x));
                 cells[y][x] = cell;
                 cell.board = this;
                 add(cell);
@@ -74,6 +74,14 @@ public class Board extends JPanel implements MouseListener {
 
     public Cell[][] getCells(){
         return cells;
+    }
+
+    public void setPieces(Piece[][] pieces){
+        this.pieces = pieces;
+        for(int y = 0; y < size; ++y){
+            for(int x = 0; x < size; ++x)
+                cells[y][x].setPiece(pieces[y][x]);
+        }
     }
 
     @Override

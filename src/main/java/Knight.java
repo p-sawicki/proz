@@ -1,4 +1,5 @@
 import java.awt.Point;
+import java.util.ArrayList;
 
 public class Knight extends Piece{
     public Knight(Cell.Colour colour) {
@@ -33,18 +34,20 @@ public class Knight extends Piece{
             }
         }
         return false;
-    public ArrayList<Pair<Integer, Integer>> getPossibleMoves() {
-        ArrayList<Pair<Integer, Integer>> moves = new ArrayList<>();
-        int y = cell.getPosition().getKey();
-        int x = cell.getPosition().getValue();
-        moves.add(new Pair<>(y - 2, x - 1));
-        moves.add(new Pair<>(y - 2, x + 1));
-        moves.add(new Pair<>(y - 1, x - 2));
-        moves.add(new Pair<>(y - 1, x + 2));
-        moves.add(new Pair<>(y + 1, x - 2));
-        moves.add(new Pair<>(y + 1, x + 2));
-        moves.add(new Pair<>(y + 2, x - 1));
-        moves.add(new Pair<>(y + 2, x + 1));
+
+    public ArrayList<Move> getPossibleMoves() {
+        ArrayList<Move> moves = new ArrayList<>();
+        int y = cell.getPosition().y;
+        int x = cell.getPosition().x;
+        Point start = cell.getPosition();
+        moves.add(Move.get(start, new Point(y - 2, x - 1)));
+        moves.add(Move.get(start, new Point(y - 2, x + 1)));
+        moves.add(Move.get(start, new Point(y - 1, x - 2)));
+        moves.add(Move.get(start, new Point(y - 1, x + 2)));
+        moves.add(Move.get(start, new Point(y + 1, x - 2)));
+        moves.add(Move.get(start, new Point(y + 1, x + 2)));
+        moves.add(Move.get(start, new Point(y + 2, x - 1)));
+        moves.add(Move.get(start, new Point(y + 2, x + 1)));
         return trimPossibleMoves(moves);
     }
 }

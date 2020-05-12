@@ -1,5 +1,3 @@
-import javafx.util.Pair;
-
 import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.image.BufferedImage;
@@ -12,100 +10,112 @@ public abstract class Piece {
     protected Cell cell;
     protected BufferedImage image;
 
-    public Piece(Cell.Colour colour){
+    public Piece(Cell.Colour colour) {
         this.colour = colour;
         try {
             image = ImageIO.read(getImageFile());
-        }
-        catch(IOException e){
+        } catch (IOException e) {
             System.out.println("Could not open image: " + e.getMessage());
         }
     }
 
-    public void draw(Graphics g){
+    public void draw(Graphics g) {
         g.drawImage(image, cell.getX(), cell.getY(), cell.getWidth(), cell.getHeight(), null);
     }
 
-    public void setCell(Cell cell){
+    public void setCell(Cell cell) {
         this.cell = cell;
     }
 
-    protected ArrayList<Pair<Integer, Integer>> trimPossibleMoves(ArrayList<Pair<Integer, Integer>> moves){
-        ArrayList<Pair<Integer, Integer>> possibleMoves = new ArrayList<>();
-        for(Pair<Integer, Integer> move : moves){
-            int y = move.getKey();
-            int x = move.getValue();
-            if(y >= 0 && y < cell.getBoard().getBoardSize()){
-                if(x >= 0 && x < cell.getBoard().getBoardSize()){
+    protected ArrayList<Move> trimPossibleMoves(ArrayList<Move> moves) {
+        ArrayList<Move> possibleMoves = new ArrayList<>();
+        for (Move move : moves) {
+            int y = move.after.y;
+            int x = move.after.x;
+            if (y >= 0 && y < cell.getBoard().getBoardSize()) {
+                if (x >= 0 && x < cell.getBoard().getBoardSize()) {
                     Piece piece = cell.getBoard().getCells()[y][x].getPiece();
-                    if(piece == null || piece.getColour() != colour)
+                    if (piece == null || piece.getColour() != colour) {
+                        move.after = cell.getBoard().getCells()[y][x].getPosition();
                         possibleMoves.add(move);
+                    }
                 }
             }
         }
         return possibleMoves;
     }
 
-    protected ArrayList<Pair<Integer, Integer>> getDiagonalMoves(){
-        ArrayList<Pair<Integer, Integer>> moves = new ArrayList<>();
-        for(int y = cell.getPosition().getKey() - 1; y >= 0; --y){
-            for(int x = cell.getPosition().getValue() - 1; x >= 0; --x) {
-                moves.add(new Pair<>(y, x));
-                if(cell.getBoard().getCells()[y][x].getPiece() != null)
-                    break;
-            }
+    protected ArrayList<Move> getDiagonalMoves() {
+        ArrayList<Move> moves = new ArrayList<>();
+        Point start = cell.getPosition();
+        int y = start.y - 1;
+        int x = start.x - 1;
+        while (y >= 0 && x >= 0) {
+            moves.add(Move.get(start, cell.getBoard().getCells()[y][x].getPosition()));
+            if (cell.getBoard().getCells()[y][x].getPiece() != null)
+                break;
+            --y;
+            --x;
         }
-        for(int y = cell.getPosition().getKey() - 1; y >= 0; --y){
-            for(int x = cell.getPosition().getValue() + 1; x < cell.getBoard().getBoardSize(); ++x) {
-                moves.add(new Pair<>(y, x));
-                if(cell.getBoard().getCells()[y][x].getPiece() != null)
-                    break;
-            }
+        y = start.y - 1;
+        x = start.x + 1;
+        while (y >= 0 && x < cell.getBoard().getBoardSize()) {
+            moves.add(Move.get(start, cell.getBoard().getCells()[y][x].getPosition()));
+            if (cell.getBoard().getCells()[y][x].getPiece() != null)
+                break;
+            --y;
+            ++x;
         }
-        for(int y = cell.getPosition().getKey() + 1; y < cell.getBoard().getBoardSize(); ++y){
-            for(int x = cell.getPosition().getValue() - 1; x >= 0; --x) {
-                moves.add(new Pair<>(y, x));
-                if(cell.getBoard().getCells()[y][x].getPiece() != null)
-                    break;
-            }
+        y = start.y + 1;
+        x = start.x - 1;
+        while (y < cell.getBoard().getBoardSize() && x >= 0) {
+            moves.add(Move.get(start, cell.getBoard().getCells()[y][x].getPosition()));
+            if (cell.getBoard().getCells()[y][x].getPiece() != null)
+                break;
+            ++y;
+            --x;
         }
-        for(int y = cell.getPosition().getKey() + 1; y < cell.getBoard().getBoardSize(); ++y){
-            for(int x = cell.getPosition().getValue() + 1; x < cell.getBoard().getBoardSize(); ++x) {
-                moves.add(new Pair<>(y, x));
-                if(cell.getBoard().getCells()[y][x].getPiece() != null)
-                    break;
-            }
+        y = start.y + 1;
+        x = start.x + 1;
+        while (y < cell.getBoard().getBoardSize() && x < cell.getBoard().getBoardSize()) {
+            moves.add(Move.get(start, cell.getBoard().getCells()[y][x].getPosition()));
+            if (cell.getBoard().getCells()[y][x].getPiece() != null)
+                break;
+            ++y;
+            ++x;
         }
         return moves;
     }
 
-    protected ArrayList<Pair<Integer, Integer>> getVerticalMoves(){
-        ArrayList<Pair<Integer, Integer>> moves = new ArrayList<>();
-        int x = cell.getPosition().getValue();
-        for(int y = cell.getPosition().getKey() - 1; y >= 0; --y){
-            moves.add(new Pair<>(y, x));
-            if(cell.getBoard().getCells()[y][x].getPiece() != null)
+    protected ArrayList<Move> getVerticalMoves() {
+        ArrayList<Move> moves = new ArrayList<>();
+        Point start = cell.getPosition();
+        int x = start.x;
+        for (int y = cell.getPosition().y - 1; y >= 0; --y) {
+            moves.add(Move.get(start, cell.getBoard().getCells()[y][x].getPosition()));
+            if (cell.getBoard().getCells()[y][x].getPiece() != null)
                 break;
         }
-        for(int y = cell.getPosition().getKey() + 1; y < cell.getBoard().getBoardSize(); ++y) {
-            moves.add(new Pair<>(y, x));
+        for (int y = cell.getPosition().y + 1; y < cell.getBoard().getBoardSize(); ++y) {
+            moves.add(Move.get(start, cell.getBoard().getCells()[y][x].getPosition()));
             if (cell.getBoard().getCells()[y][x].getPiece() != null)
                 break;
         }
         return moves;
     }
 
-    protected ArrayList<Pair<Integer, Integer>> getHorizontalMoves(){
-        ArrayList<Pair<Integer, Integer>> moves = new ArrayList<>();
-        int y = cell.getPosition().getKey();
-        for(int x = cell.getPosition().getValue() - 1; x >= 0; --x){
-            moves.add(new Pair<>(y, x));
-            if(cell.getBoard().getCells()[y][x].getPiece() != null)
+    protected ArrayList<Move> getHorizontalMoves() {
+        ArrayList<Move> moves = new ArrayList<>();
+        Point start = cell.getPosition();
+        int y = start.y;
+        for (int x = cell.getPosition().x - 1; x >= 0; --x) {
+            moves.add(Move.get(start, cell.getBoard().getCells()[y][x].getPosition()));
+            if (cell.getBoard().getCells()[y][x].getPiece() != null)
                 break;
         }
-        for(int x = cell.getPosition().getValue() + 1; x < cell.getBoard().getBoardSize(); ++x){
-            moves.add(new Pair<>(y, x));
-            if(cell.getBoard().getCells()[y][x].getPiece() != null)
+        for (int x = cell.getPosition().x + 1; x < cell.getBoard().getBoardSize(); ++x) {
+            moves.add(Move.get(start, cell.getBoard().getCells()[y][x].getPosition()));
+            if (cell.getBoard().getCells()[y][x].getPiece() != null)
                 break;
         }
         return moves;
@@ -117,9 +127,9 @@ public abstract class Piece {
 
     public abstract String getName();
 
-    public abstract ArrayList<Pair<Integer, Integer>> getPossibleMoves();
+    public abstract ArrayList<Move> getPossibleMoves();
 
-    private File getImageFile(){
+    private File getImageFile() {
         return new File("src/main/resources/alpha/alpha/320/" + getColourAsString() + getName() + ".png");
     }
 
