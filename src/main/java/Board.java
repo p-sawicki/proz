@@ -1,5 +1,6 @@
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.*;
 
 public class Board extends JPanel implements MouseListener {
     private final Cell[][] cells;
@@ -37,7 +38,7 @@ public class Board extends JPanel implements MouseListener {
                 Cell cell = new Cell(color);
                 cells[y][x] = cell;
                 cell.setPosition(x, y);
-                cell.boardptr = this;
+                cell.board = this;
                 add(cell);
 
                 if(pieces[y][x] != null)
@@ -52,7 +53,7 @@ public class Board extends JPanel implements MouseListener {
         setPreferredSize(windowSize);
         setSize(windowSize);
 
-        whiteTurn = 1;
+        whiteTurn = true;
     }
 
     public Cell[][] getCells() {
@@ -73,38 +74,40 @@ public class Board extends JPanel implements MouseListener {
     }
 
     public boolean moveIfPossible(Cell start, Cell destination){ // moves piece if not contradicted by rules
-        boolean moveable = start.piece.isAppropriateMove(start, destination);
+        boolean moveable = start.getPiece().isAppropriateMove(destination);
         if(moveable){
-            Piece movedPiece = start.piece;
-            start.piece = null;
+            Piece movedPiece = start.getPiece();
+            start.setPiece(null);
             //remove piece image from cell
-            destination.piece = movedPiece;
+            destination.setPiece(movedPiece);
             //add piece image to cell
-            return 1;
+            return true;
         }
-        return 0;
+        return false;
     }
 
-    @Override
+    //@Override
+    // this function is invoked when the mouse button has been clicked (pressed and released) on a component
     public void mouseClicked(MouseEvent e){
         Cell clicked = (Cell) getComponentAt(new Point(e.getX(), e.getY()));
+        boolean isMoved = false, isMoved2 = false;
 
         if(clickedCell == null){ //player hasn't chosen cell to move yet
-            if(clicked.getOccupation() == 1){
+            if(clicked.getOccupation() == true){
                 if(clicked.getPiece().getColourAsString() == "White" && whiteTurn
                     || clicked.getPiece().getColourAsString() == "Black" && !whiteTurn){
                     this.clickedCell = clicked;
                 }
             }
         } else { // player clicked mouse when some cell is chosen
-            if(clicked.getOccupation() == 0){
-                boolean isMoved = moveIfPossible(clickedCell, clicked); //movePiece from clickedCell to clicked
+            if(clicked.getOccupation() == false){
+                isMoved = moveIfPossible(clickedCell, clicked); //movePiece from clickedCell to clicked
                 this.clickedCell = null;
             }
-            if(clicked.getOccupation() == 1){
+            if(clicked.getOccupation() == true){
                 if(clicked.getPiece().getColourAsString() == "White" && !whiteTurn
                         || clicked.getPiece().getColourAsString() == "Black" && whiteTurn){
-                    boolean isMoved2 = moveIfPossible(clickedCell, clicked); //beat clicked with clickedCell
+                    isMoved2 = moveIfPossible(clickedCell, clicked); //beat clicked with clickedCell
                     this.clickedCell = null;
                 }
                 if(clicked.getPiece().getColourAsString() == "White" && whiteTurn
@@ -112,11 +115,33 @@ public class Board extends JPanel implements MouseListener {
                     this.clickedCell = clicked;
                 }
             }
-            if(isMoved || isMoved2){
+            if(isMoved || isMoved2) {
                 switchTurn();
                 // check for checkmate situation
             }
         }
     }
 
+    // this function is invoked when the mouse enters a component
+    public void mouseEntered(MouseEvent e) {}
+
+    // this function is invoked when the mouse exits the component
+    public void mouseExited(MouseEvent e) {}
+
+    // this function is invoked when the mouse button has been pressed on a component
+    public void mousePressed(MouseEvent e) {}
+
+    // this function is invoked when the mouse button has been released on a component
+    public void mouseReleased(MouseEvent e) {}
+
+
+
+
+
+  /*  public static void main(String s[])
+    {
+        System.out.println("Creating new board...");
+        new Board("Test chess board");
+        System.out.println("New board created");
+    }*/
 }

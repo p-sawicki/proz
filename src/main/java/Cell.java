@@ -1,15 +1,16 @@
 import javax.swing.*;
 import java.awt.*;
+import javafx.util.Pair;
 
 public class Cell extends JComponent {
     private final Colour colour;
     private Piece piece;
-    protected Board* boardptr;
-    private Pair<int, int> position;
+    protected Board board;
+    private Pair<Integer, Integer> position;
 
     public enum Colour {white, black}
 
-    public Cell(Colour color){
+    public Cell(Colour color) {
         this.colour = color;
 
         setBorder(BorderFactory.createEmptyBorder());
@@ -25,15 +26,15 @@ public class Cell extends JComponent {
     }
 
     public void setPosition(int x, int y){
-        this.position = new Pair<int, int>(x, y);
+        this.position = new Pair<Integer, Integer>(x, y);
     }
 
-    public Pair<int, int> getPosition() {
-        return this.position;
+    public Pair<Integer, Integer> getPosition() {
+        return position;
     }
 
     public boolean getOccupation() {
-        return isOccupied = this.getPiece() == null ? 0 : 1;
+        return this.getPiece() == null ? false : true;
     }
 
     public void paint(Graphics g){

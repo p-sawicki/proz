@@ -1,3 +1,5 @@
+import javafx.util.Pair;
+
 public class Pawn extends Piece{
     public Pawn(Cell.Colour colour) {
         super(colour);
@@ -9,48 +11,48 @@ public class Pawn extends Piece{
     }
 
     @Override
-    public abstract boolean isAppropriateMove(Cell destination) {
-        Pair<int, int> curPos = super.cell.getPosition();
-        int curX = curPos.getValue0();
-        int curY = curPos.getValue1();
-        Pair<int, int> desPos = destination.getPosition();
-        int desX = desPos.getValue0();
-        int desY = desPos.getValue1();
+    public boolean isAppropriateMove(Cell destination) {
+        Pair<Integer, Integer> curPos = super.cell.getPosition();
+        int curX = curPos.getValue();
+        int curY = curPos.getKey();
+        Pair<Integer, Integer> desPos = destination.getPosition();
+        int desX = desPos.getValue();
+        int desY = desPos.getKey();
         boolean isOccupied = destination.getOccupation();
-        boolean isOccupiedByWhite = destination.piece.getColourAsString() == "White" ? 1 : 0;
+        boolean isOccupiedByWhite = destination.getPiece().getColourAsString() == "White" ? true : false;
 
-        if(super.cell.piece.getColourAsString() == "White") {
-            if (curX = desX) {
+        if(super.cell.getPiece().getColourAsString() == "White") {
+            if (curX == desX) {
                 if ( (curY == 1 && desY == 3) && !isOccupied){ // pawn's first move
                     if(super.checkIfPathIsClear(super.cell, destination)) // there is no other piece between current pos and destination
-                        return 1; //movePiece
+                        return true; //movePiece
                 }
                 if( (desY-curY == 1) && !isOccupied){
-                    return 1; //movePiece
+                    return true; //movePiece
                 }
             }
             if( ((desX-curX == 1) || (desX-curX == -1)) && (desY-curY == 1) && isOccupied ){ //beats other piece
                 if(!isOccupiedByWhite)
-                    return 1; //movePiece to beat
+                    return true; //movePiece to beat
             }
         }
-        if(super.cell.piece.getColourAsString() == "Black") {
-            if (curX = desX) {
+        if(super.cell.getPiece().getColourAsString() == "Black") {
+            if (curX == desX) {
                 if ( (curY == 6 && desY == 4) && !isOccupied) { // pawn's first move
                     if (super.checkIfPathIsClear(super.cell, destination)) { // there is no other piece between current pos and destination
-                        return 1; //movePiece
+                        return true; //movePiece
                     }
                 }
                 if( (desY-curY == -1) && !isOccupied) {
-                    return 1; //movePiece
+                    return true; //movePiece
                 }
             }
             if( ((desX-curX == 1) || (desX-curX == -1)) && (desY-curY == -1) && isOccupied ) { //beats other piece
                 if(isOccupiedByWhite) {
-                    return 1; //movePiece to beat
+                    return true; //movePiece to beat
                 }
             }
         }
-        return 0;
+        return false;
     }
 }
