@@ -12,7 +12,6 @@ public class Board extends JPanel implements MouseListener {
     private boolean whiteTurn;
     private Point clickedCellPosition = new Point(-1, -1);
     private final Point nullPosition = new Point(-1, -1);
-    private Piece nullPiece;
 
     //starting board state for testing
     private final Piece[][] pieces = {
@@ -65,6 +64,8 @@ public class Board extends JPanel implements MouseListener {
 
     public void switchTurn(){
         this.whiteTurn = !this.whiteTurn;
+        String currentTurn = whiteTurn ? "White" : "Black";
+        System.out.println(currentTurn + " turn");
     }
 
     @Override
@@ -150,63 +151,12 @@ public class Board extends JPanel implements MouseListener {
     // this function is invoked when the mouse enters a component
     public void mouseEntered(MouseEvent e) {}
 
-    //public void mouseClicked(MouseEvent e) {}
-
     // this function is invoked when the mouse exits the component
     public void mouseExited(MouseEvent e) {}
 
     // this function is invoked when the mouse button has been pressed on a component
-    public void mousePressed(MouseEvent e) {
-     /*   Cell pressed = (Cell) getComponentAt(new Point(e.getX(), e.getY()));
-        System.out.println("Mouse pressed");
-
-        if(pressed.getOccupation()){
-            if(pressed.getPiece().getColourAsString().equals("White") && whiteTurn
-                    || pressed.getPiece().getColourAsString().equals("Black") && !whiteTurn){
-                this.clickedCell = pressed;
-            }
-        }
-
-*/
-    }
+    public void mousePressed(MouseEvent e) {}
 
     // this function is invoked when the mouse button has been released on a component
-    public void mouseReleased(MouseEvent e) {
-/*        Cell released = (Cell) getComponentAt(new Point(e.getX(), e.getY()));
-        boolean isMoved = false, isMoved2 = false;
-        System.out.println("Mouse released");
-
-        if(!released.getOccupation()){
-            isMoved = moveIfPossible(clickedCell, released); //movePiece from clickedCell to clicked
-            this.clickedCell = null;
-        }
-        if(released.getOccupation()){
-            if(released.getPiece().getColourAsString().equals("White") && !whiteTurn
-                    || released.getPiece().getColourAsString().equals("Black") && whiteTurn){
-                isMoved2 = moveIfPossible(clickedCell, released); //beat clicked with clickedCell
-                this.clickedCell = null;
-            }
-            if(released.getPiece().getColourAsString().equals("White") && whiteTurn
-                    || released.getPiece().getColourAsString().equals("Black") && !whiteTurn){
-                this.clickedCell = released;
-            }
-        }
-        if(isMoved || isMoved2) {
-            switchTurn();
-            repaint();
-            // check for checkmate situation
-        }
-*/
-    }
-
-
-
-
-
-  /*  public static void main(String s[])
-    {
-        System.out.println("Creating new board...");
-        new Board("Test chess board");
-        System.out.println("New board created");
-    }*/
+    public void mouseReleased(MouseEvent e) {}
 }

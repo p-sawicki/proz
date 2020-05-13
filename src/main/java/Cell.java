@@ -26,7 +26,6 @@ public class Cell extends JComponent {
         piece = null;
     }
 
-
     public Piece getPiece() {
         return this.piece;
     }
@@ -54,7 +53,7 @@ public class Cell extends JComponent {
 
     public String getPieceNameColor(){
         if(this.getPiece() != null)
-            return this.getPiece().getName() + " " + this.getPiece().getColourAsString() + "\n";
+            return this.getPiece().getColourAsString() + " " + this.getPiece().getName();
         return "";
     }
 }

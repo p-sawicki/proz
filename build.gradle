@@ -1,6 +1,6 @@
 plugins {
     id 'java'
-    id 'org.openjfx.javafxplugin' version '0.0.8'
+    //id 'org.openjfx.javafxplugin' version '0.0.8'
     id 'application'
 }
 
@@ -15,9 +15,14 @@ dependencies {
     testCompile group: 'junit', name: 'junit', version: '4.12'
 }
 
-javafx {
-    version = "11.0.2"
-    modules = [ 'javafx.controls' ]
-}
 
 mainClassName = 'Game'
+
+test {
+    include 'src/test/java/*'
+}
+
+/*javafx {
+    version = "11.0.2"
+    modules = [ 'javafx.controls' ]
+}*/
