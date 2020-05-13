@@ -1,17 +1,18 @@
 import javax.swing.*;
 import java.awt.*;
-import javafx.util.Pair;
 
 public class Cell extends JComponent {
     private final Colour colour;
     private Piece piece;
     protected Board board;
-    private Pair<Integer, Integer> position;
+    private final Point position;
 
     public enum Colour {white, black}
 
-    public Cell(Colour color) {
+    public Cell(Colour color, Board board, Point position) {
         this.colour = color;
+        this.board = board;
+        this.position = position;
 
         setBorder(BorderFactory.createEmptyBorder());
     }
@@ -30,11 +31,7 @@ public class Cell extends JComponent {
         return this.piece;
     }
 
-    public void setPosition(int x, int y){
-        this.position = new Pair<Integer, Integer>(x, y);
-    }
-
-    public Pair<Integer, Integer> getPosition() {
+    public Point getPosition() {
         return position;
     }
 

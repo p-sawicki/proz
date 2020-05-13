@@ -1,4 +1,4 @@
-import javafx.util.Pair;
+import java.awt.Point;
 
 public class Queen extends Piece{
     public Queen(Cell.Colour colour) {
@@ -12,12 +12,12 @@ public class Queen extends Piece{
 
     @Override
     public boolean isAppropriateMove(Cell destination) {
-        Pair<Integer, Integer> curPos = super.cell.getPosition();
-        int curX = curPos.getValue();
-        int curY = curPos.getKey();
-        Pair<Integer, Integer> desPos = destination.getPosition();
-        int desX = desPos.getValue();
-        int desY = desPos.getKey();
+        Point curPos = super.cell.getPosition();
+        int curX = curPos.x;
+        int curY = curPos.y;
+        Point desPos = destination.getPosition();
+        int desX = desPos.x;
+        int desY = desPos.y;
         boolean isOccupied = destination.getOccupation();
         int moveX = Math.abs(desX - curX);
         int moveY = Math.abs(desY - curY);

@@ -1,5 +1,3 @@
-import javafx.util.Pair;
-
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
@@ -12,8 +10,8 @@ public class Board extends JPanel implements MouseListener {
     private final Dimension windowSize = new Dimension(windowWidth, windowHeight);
 
     private boolean whiteTurn;
-    private Pair<Integer, Integer> clickedCellPosition = new Pair<>(-1, -1);
-    private final Pair<Integer, Integer> nullPosition = new Pair<>(-1, -1);
+    private Point clickedCellPosition = new Point(-1, -1);
+    private final Point nullPosition = new Point(-1, -1);
     private Piece nullPiece;
 
     //starting board state for testing
@@ -41,9 +39,8 @@ public class Board extends JPanel implements MouseListener {
         Cell.Colour color = Cell.Colour.black;
         for(int y = size - 1; y >= 0; --y) {
             for(int x = 0; x < size; ++x) {
-                Cell cell = new Cell(color);
+                Cell cell = new Cell(color, this, new Point(x, y));
                 cells[y][x] = cell;
-                cell.setPosition(y, x);
                 cell.board = this;
                 add(cell);
 
@@ -81,8 +78,8 @@ public class Board extends JPanel implements MouseListener {
 
     public boolean moveIfPossible(Cell start, Cell destination){ // moves piece if not contradicted by rules
         System.out.println("moveIfPossible function called for element " + start.getPieceNameColor()
-                + " from cell X:" + start.getPosition().getValue() + ", Y:" + start.getPosition().getKey()
-                + " to cell X:" + destination.getPosition().getValue() + ", Y:" + destination.getPosition().getKey());
+                + " from cell X:" + start.getPosition().x + ", Y:" + start.getPosition().y
+                + " to cell X:" + destination.getPosition().x + ", Y:" + destination.getPosition().y);
         if(!start.getOccupation()) {
             System.out.println("start cell not occupied, position: " + start.getPosition().toString());
             return false;
@@ -103,11 +100,11 @@ public class Board extends JPanel implements MouseListener {
     // this function is invoked when the mouse button has been clicked (pressed and released) on a component
     public void mouseClicked(MouseEvent e){
         Cell clicked = (Cell) getComponentAt(new Point(e.getX(), e.getY()));
-        Pair<Integer, Integer> clickedPosition = clicked.getPosition();
+        Point clickedPosition = clicked.getPosition();
         boolean isMoved = false, isMoved2 = false;
         System.out.println("Mouse clicked on the component " + clicked.getPieceNameColor());
-        int posX = clickedPosition.getValue();
-        int posY = clickedPosition.getKey();
+        int posX = clickedPosition.x;
+        int posY = clickedPosition.y;
         System.out.println("posX = " + posX + ", posY = " + posY);
 
         if(clickedCellPosition.equals(nullPosition)){ //player hasn't chosen cell to move yet
@@ -119,8 +116,8 @@ public class Board extends JPanel implements MouseListener {
                 }
             }
         } else { // player clicked mouse when some cell is chosen
-            int prevX = clickedCellPosition.getValue();
-            int prevY = clickedCellPosition.getKey();
+            int prevX = clickedCellPosition.x;
+            int prevY = clickedCellPosition.y;
 
             if(!clicked.getOccupation()) {
                 System.out.println("Mouse clicked to move component to vacant cell");
