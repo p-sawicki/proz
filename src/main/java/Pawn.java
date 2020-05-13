@@ -19,9 +19,8 @@ public class Pawn extends Piece{
         int desX = desPos.getValue();
         int desY = desPos.getKey();
         boolean isOccupied = destination.getOccupation();
-        boolean isOccupiedByWhite = destination.getPiece().getColourAsString() == "White" ? true : false;
 
-        if(super.cell.getPiece().getColourAsString() == "White") {
+        if(super.cell.getPiece().getColourAsString().equals("White")) {
             if (curX == desX) {
                 if ( (curY == 1 && desY == 3) && !isOccupied){ // pawn's first move
                     if(super.checkIfPathIsClear(super.cell, destination)) // there is no other piece between current pos and destination
@@ -32,11 +31,12 @@ public class Pawn extends Piece{
                 }
             }
             if( ((desX-curX == 1) || (desX-curX == -1)) && (desY-curY == 1) && isOccupied ){ //beats other piece
-                if(!isOccupiedByWhite)
+                if(destination.getPiece().getColourAsString().equals("Black")) {
                     return true; //movePiece to beat
+                }
             }
         }
-        if(super.cell.getPiece().getColourAsString() == "Black") {
+        if(super.cell.getPiece().getColourAsString().equals("Black")) {
             if (curX == desX) {
                 if ( (curY == 6 && desY == 4) && !isOccupied) { // pawn's first move
                     if (super.checkIfPathIsClear(super.cell, destination)) { // there is no other piece between current pos and destination
@@ -48,7 +48,7 @@ public class Pawn extends Piece{
                 }
             }
             if( ((desX-curX == 1) || (desX-curX == -1)) && (desY-curY == -1) && isOccupied ) { //beats other piece
-                if(isOccupiedByWhite) {
+                if(destination.getPiece().getColourAsString().equals("White")) {
                     return true; //movePiece to beat
                 }
             }

@@ -51,47 +51,52 @@ public abstract class Piece {
         int s,d, m, t;
 
         if(startX == destX){ // vertical movement
-            s = destY > startY ? startY : destY;
-            d = destY > startY ? destY : startY;
+            s = Math.min(destY, startY);
+            d = Math.max(destY, startY);
             for(int k = s+1; k < d; k++){
-                if(cells[k][destX].getOccupation() == true)
+                if(cells[k][destX].getOccupation())
                     return false;
             }
         }
         if(startY == destY){ // horizontal movement
-            s = destX > startX ? startX : destX;
-            d = destX > startX ? destX : startX;
+            s = Math.min(destX, startX);
+            d = Math.max(destX, startX);
             for(int k = s+1; k < d; k++){
-                if(cells[destY][k].getOccupation() == true)
+                if(cells[destY][k].getOccupation())
                     return false;
             }
         }
         if(startX != destX && startY != destY) { // diagonal movement
             if( (destX > startX && destY > startY) || (destX < startX && destY < startY) ) {
-                s = destX > startX ? startX : destX; // s - lowest X, d - highest X
-                d = destX > startX ? destX : startX;
-                m = destY > startY ? startY : destY; // m - lowest Y, t - highest Y
-                t = destY > startY ? destY : startY;
+                s = Math.min(destX, startX); // s - lowest X, d - highest X
+                d = Math.max(destX, startX);
+                m = Math.min(destY, startY); // m - lowest Y, t - highest Y
+                t = Math.max(destY, startY);
                 int l = m + 1;
                 for (int k = s + 1; k<d; k++){ //increase X, increase Y
-                    if (cells[l][k].getOccupation() == true)
+                    if (cells[l][k].getOccupation()) {
+                        System.out.println("Path is not clear");
                         return false;
+                    }
                     l++;
                 }
             }
             else{
-                s = destX > startX ? startX : destX; // s - lowest X, d - highest X
-                d = destX > startX ? destX : startX;
-                m = destY > startY ? startY : destY; // m - lowest Y, t - highest Y
-                t = destY > startY ? destY : startY;
+                s = Math.min(destX, startX); // s - lowest X, d - highest X
+                d = Math.max(destX, startX);
+                m = Math.min(destY, startY); // m - lowest Y, t - highest Y
+                t = Math.max(destY, startY);
                 int l = t - 1;
                 for (int k = s + 1; k<d; k++){ //increase X, decrease Y
-                    if (cells[l][k].getOccupation() == true)
+                    if (cells[l][k].getOccupation()) {
+                        System.out.println("Path is not clear");
                         return false;
+                    }
                     l--;
                 }
             }
         }
+        System.out.println("Path is clear");
         return true;
     }
 }
