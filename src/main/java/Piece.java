@@ -3,7 +3,6 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
-import javafx.util.Pair;
 
 public abstract class Piece {
     protected final Cell.Colour colour;
@@ -41,12 +40,12 @@ public abstract class Piece {
     public abstract boolean isAppropriateMove(Cell destination); //checks if piece selected by player can be moved to selected cell
 
     public boolean checkIfPathIsClear(Cell start, Cell destination){ // checks if cells between start and destionation are not occupied
-        Pair<Integer, Integer> startPos = start.getPosition();
-        int startX = startPos.getValue();
-        int startY = startPos.getKey();
-        Pair<Integer, Integer> desPos = destination.getPosition();
-        int destX = desPos.getValue();
-        int destY = desPos.getKey();
+        Point startPos = start.getPosition();
+        int startX = startPos.x;
+        int startY = startPos.y;
+        Point desPos = destination.getPosition();
+        int destX = desPos.x;
+        int destY = desPos.y;
         Cell[][] cells = start.board.getCells();
         int s,d, m, t;
 
