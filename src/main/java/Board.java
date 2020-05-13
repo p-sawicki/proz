@@ -1,3 +1,5 @@
+import javafx.util.Pair;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
@@ -10,34 +12,38 @@ public class Board extends JPanel implements MouseListener {
     private final Dimension windowSize = new Dimension(windowWidth, windowHeight);
 
     private boolean whiteTurn;
-    private Cell clickedCell;
+    private Pair<Integer, Integer> clickedCellPosition = new Pair<>(-1, -1);
+    private final Pair<Integer, Integer> nullPosition = new Pair<>(-1, -1);
+    private Piece nullPiece;
 
     //starting board state for testing
     private final Piece[][] pieces = {
-            {new Rook(Cell.Colour.black), new Knight(Cell.Colour.black), new Bishop(Cell.Colour.black), new Queen(Cell.Colour.black),
-                    new King(Cell.Colour.black), new Bishop(Cell.Colour.black), new Knight(Cell.Colour.black), new Rook(Cell.Colour.black)},
-            {new Pawn(Cell.Colour.black), new Pawn(Cell.Colour.black), new Pawn(Cell.Colour.black), new Pawn(Cell.Colour.black),
-                    new Pawn(Cell.Colour.black), new Pawn(Cell.Colour.black), new Pawn(Cell.Colour.black), new Pawn(Cell.Colour.black)},
-            {null, null, null, null, null, null, null, null},
-            {null, null, null, null, null, null, null, null},
-            {null, null, null, null, null, null, null, null},
-            {null, null, null, null, null, null, null, null},
+            {new Rook(Cell.Colour.white), new Knight(Cell.Colour.white), new Bishop(Cell.Colour.white), new Queen(Cell.Colour.white),
+                    new King(Cell.Colour.white), new Bishop(Cell.Colour.white), new Knight(Cell.Colour.white), new Rook(Cell.Colour.white)},
             {new Pawn(Cell.Colour.white), new Pawn(Cell.Colour.white), new Pawn(Cell.Colour.white), new Pawn(Cell.Colour.white),
                     new Pawn(Cell.Colour.white), new Pawn(Cell.Colour.white), new Pawn(Cell.Colour.white), new Pawn(Cell.Colour.white)},
-            {new Rook(Cell.Colour.white), new Knight(Cell.Colour.white), new Bishop(Cell.Colour.white), new Queen(Cell.Colour.white),
-                    new King(Cell.Colour.white), new Bishop(Cell.Colour.white), new Knight(Cell.Colour.white), new Rook(Cell.Colour.white)}
+            {null, null, null, null, null, null, null, null},
+            {null, null, null, null, null, null, null, null},
+            {null, null, null, null, null, null, null, null},
+            {null, null, null, null, null, null, null, null},
+            {new Pawn(Cell.Colour.black), new Pawn(Cell.Colour.black), new Pawn(Cell.Colour.black), new Pawn(Cell.Colour.black),
+                    new Pawn(Cell.Colour.black), new Pawn(Cell.Colour.black), new Pawn(Cell.Colour.black), new Pawn(Cell.Colour.black)},
+            {new Rook(Cell.Colour.black), new Knight(Cell.Colour.black), new Bishop(Cell.Colour.black), new Queen(Cell.Colour.black),
+                    new King(Cell.Colour.black), new Bishop(Cell.Colour.black), new Knight(Cell.Colour.black), new Rook(Cell.Colour.black)}
     };
 
     public Board(){
         cells = new Cell[size][size];
         setLayout(new GridLayout(size, size, 0, 0));
 
+        this.addMouseListener(this);
+
         Cell.Colour color = Cell.Colour.black;
-        for(int y = 0; y < size; ++y){
-            for(int x = 0; x < size; ++x){
+        for(int y = size - 1; y >= 0; --y) {
+            for(int x = 0; x < size; ++x) {
                 Cell cell = new Cell(color);
                 cells[y][x] = cell;
-                cell.setPosition(x, y);
+                cell.setPosition(y, x);
                 cell.board = this;
                 add(cell);
 
@@ -74,13 +80,20 @@ public class Board extends JPanel implements MouseListener {
     }
 
     public boolean moveIfPossible(Cell start, Cell destination){ // moves piece if not contradicted by rules
+        System.out.println("moveIfPossible function called for element " + start.getPieceNameColor()
+                + " from cell X:" + start.getPosition().getValue() + ", Y:" + start.getPosition().getKey()
+                + " to cell X:" + destination.getPosition().getValue() + ", Y:" + destination.getPosition().getKey());
+        if(!start.getOccupation()) {
+            System.out.println("start cell not occupied, position: " + start.getPosition().toString());
+            return false;
+        }
+
         boolean moveable = start.getPiece().isAppropriateMove(destination);
-        if(moveable){
+        if(moveable) {
             Piece movedPiece = start.getPiece();
-            start.setPiece(null);
-            //remove piece image from cell
+            start.removePiece();
             destination.setPiece(movedPiece);
-            //add piece image to cell
+            repaint();
             return true;
         }
         return false;
@@ -90,49 +103,104 @@ public class Board extends JPanel implements MouseListener {
     // this function is invoked when the mouse button has been clicked (pressed and released) on a component
     public void mouseClicked(MouseEvent e){
         Cell clicked = (Cell) getComponentAt(new Point(e.getX(), e.getY()));
+        Pair<Integer, Integer> clickedPosition = clicked.getPosition();
         boolean isMoved = false, isMoved2 = false;
+        System.out.println("Mouse clicked on the component " + clicked.getPieceNameColor());
+        int posX = clickedPosition.getValue();
+        int posY = clickedPosition.getKey();
+        System.out.println("posX = " + posX + ", posY = " + posY);
 
-        if(clickedCell == null){ //player hasn't chosen cell to move yet
-            if(clicked.getOccupation() == true){
-                if(clicked.getPiece().getColourAsString() == "White" && whiteTurn
-                    || clicked.getPiece().getColourAsString() == "Black" && !whiteTurn){
-                    this.clickedCell = clicked;
+        if(clickedCellPosition.equals(nullPosition)){ //player hasn't chosen cell to move yet
+            if(clicked.getOccupation()) {
+                System.out.println("Mouse clicked to choose component");
+                if(clicked.getPiece().getColourAsString().equals("White") && whiteTurn
+                    || clicked.getPiece().getColourAsString().equals("Black") && !whiteTurn){
+                    this.clickedCellPosition = clickedPosition;
                 }
             }
         } else { // player clicked mouse when some cell is chosen
-            if(clicked.getOccupation() == false){
-                isMoved = moveIfPossible(clickedCell, clicked); //movePiece from clickedCell to clicked
-                this.clickedCell = null;
+            int prevX = clickedCellPosition.getValue();
+            int prevY = clickedCellPosition.getKey();
+
+            if(!clicked.getOccupation()) {
+                System.out.println("Mouse clicked to move component to vacant cell");
+
+                isMoved = moveIfPossible(cells[prevY][prevX], clicked); //movePiece from clickedCell to clicked
+                this.clickedCellPosition = nullPosition;
             }
-            if(clicked.getOccupation() == true){
-                if(clicked.getPiece().getColourAsString() == "White" && !whiteTurn
-                        || clicked.getPiece().getColourAsString() == "Black" && whiteTurn){
-                    isMoved2 = moveIfPossible(clickedCell, clicked); //beat clicked with clickedCell
-                    this.clickedCell = null;
+            if(clicked.getOccupation()){
+                if(clicked.getPiece().getColourAsString().equals("White") && !whiteTurn
+                        || clicked.getPiece().getColourAsString().equals("Black") && whiteTurn){
+                    System.out.println("Mouse clicked to beat component");
+                    isMoved2 = moveIfPossible(cells[prevY][prevX], clicked); //beat clicked with clickedCell
+                    this.clickedCellPosition = nullPosition;
                 }
-                if(clicked.getPiece().getColourAsString() == "White" && whiteTurn
-                        || clicked.getPiece().getColourAsString() == "Black" && !whiteTurn){
-                    this.clickedCell = clicked;
+                if(clicked.getPiece().getColourAsString().equals("White") && whiteTurn
+                        || clicked.getPiece().getColourAsString().equals("Black") && !whiteTurn){
+                    System.out.println("Mouse clicked to change component to move");
+                    this.clickedCellPosition = clickedPosition;
                 }
             }
             if(isMoved || isMoved2) {
+                System.out.println("One of the components was moved");
                 switchTurn();
                 // check for checkmate situation
             }
         }
+        repaint();
     }
 
     // this function is invoked when the mouse enters a component
     public void mouseEntered(MouseEvent e) {}
 
+    //public void mouseClicked(MouseEvent e) {}
+
     // this function is invoked when the mouse exits the component
     public void mouseExited(MouseEvent e) {}
 
     // this function is invoked when the mouse button has been pressed on a component
-    public void mousePressed(MouseEvent e) {}
+    public void mousePressed(MouseEvent e) {
+     /*   Cell pressed = (Cell) getComponentAt(new Point(e.getX(), e.getY()));
+        System.out.println("Mouse pressed");
+
+        if(pressed.getOccupation()){
+            if(pressed.getPiece().getColourAsString().equals("White") && whiteTurn
+                    || pressed.getPiece().getColourAsString().equals("Black") && !whiteTurn){
+                this.clickedCell = pressed;
+            }
+        }
+
+*/
+    }
 
     // this function is invoked when the mouse button has been released on a component
-    public void mouseReleased(MouseEvent e) {}
+    public void mouseReleased(MouseEvent e) {
+/*        Cell released = (Cell) getComponentAt(new Point(e.getX(), e.getY()));
+        boolean isMoved = false, isMoved2 = false;
+        System.out.println("Mouse released");
+
+        if(!released.getOccupation()){
+            isMoved = moveIfPossible(clickedCell, released); //movePiece from clickedCell to clicked
+            this.clickedCell = null;
+        }
+        if(released.getOccupation()){
+            if(released.getPiece().getColourAsString().equals("White") && !whiteTurn
+                    || released.getPiece().getColourAsString().equals("Black") && whiteTurn){
+                isMoved2 = moveIfPossible(clickedCell, released); //beat clicked with clickedCell
+                this.clickedCell = null;
+            }
+            if(released.getPiece().getColourAsString().equals("White") && whiteTurn
+                    || released.getPiece().getColourAsString().equals("Black") && !whiteTurn){
+                this.clickedCell = released;
+            }
+        }
+        if(isMoved || isMoved2) {
+            switchTurn();
+            repaint();
+            // check for checkmate situation
+        }
+*/
+    }
 
 
 

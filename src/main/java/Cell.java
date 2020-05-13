@@ -21,6 +21,11 @@ public class Cell extends JComponent {
         piece.setCell(this);
     }
 
+    public void removePiece(){
+        piece = null;
+    }
+
+
     public Piece getPiece() {
         return this.piece;
     }
@@ -48,5 +53,11 @@ public class Cell extends JComponent {
         g.fillRect(getX(), getY(), getWidth(), getHeight());
         if(piece != null)
             piece.draw(g);
+    }
+
+    public String getPieceNameColor(){
+        if(this.getPiece() != null)
+            return this.getPiece().getName() + " " + this.getPiece().getColourAsString() + "\n";
+        return "";
     }
 }
