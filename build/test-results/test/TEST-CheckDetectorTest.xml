@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="CheckDetectorTest" tests="3" skipped="0" failures="0" errors="0" timestamp="2020-05-15T22:55:26" hostname="PS" time="1.374">
+  <properties/>
+  <testcase name="testCheck" classname="CheckDetectorTest" time="0.504"/>
+  <testcase name="testCheckMate" classname="CheckDetectorTest" time="0.542"/>
+  <testcase name="testGameStart" classname="CheckDetectorTest" time="0.328"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

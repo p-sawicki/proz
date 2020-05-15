@@ -1,10 +1,12 @@
 public class BoardSetup {
-    public static Board getEmptyBoard(){
-        return new Board();
+    public static Board getEmptyBoard(Cell.Colour bottomPlayerColour){
+        Board board = new Board(bottomPlayerColour);
+        board.setPieces(getEmptyPieces());
+        return board;
     }
 
     public static Board getStartingState(){
-        Board board = new Board();
+        Board board = new Board(Cell.Colour.black);
         Piece[][] pieces = getStartingPieces();
         board.setPieces(pieces);
         return board;

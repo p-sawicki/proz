@@ -27,20 +27,16 @@ public class Cell extends JComponent {
         piece = null;
     }
 
-    public void removePiece() {
-        piece = null;
-    }
-
     public Piece getPiece() {
-        return this.piece;
+        return piece;
     }
 
-    public Point getPosition() {
-        return position;
+    public Colour getColour(){
+        return colour;
     }
 
     public boolean getOccupation() {
-        return this.getPiece() == null ? false : true;
+        return this.getPiece() != null;
     }
 
     public void paint(Graphics g) {
@@ -49,7 +45,7 @@ public class Cell extends JComponent {
         if (colour == Colour.white)
             g.setColor(new Color(221, 192, 127));
         else
-            g.setColor(new Color(101, 67, 33));
+            g.setColor(new Color(85, 76, 76));
 
         g.fillRect(getX(), getY(), getWidth(), getHeight());
         if (piece != null)
@@ -64,10 +60,6 @@ public class Cell extends JComponent {
 
     public Board getBoard() {
         return board;
-    }
-
-    public Piece getPiece() {
-        return piece;
     }
 
     public Point getPosition() {

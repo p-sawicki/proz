@@ -1,4 +1,4 @@
-import java.util.HashSet;
+import java.util.ArrayList;
 
 public class CheckDetector {
     enum State {none, check, checkmate}
@@ -7,43 +7,47 @@ public class CheckDetector {
         Cell[][] cells = board.getCells();
         Cell.Colour opponentColour = playerColour == Cell.Colour.black ? Cell.Colour.white : Cell.Colour.black;
 
-        HashSet<Move> opponentMoves = new HashSet<>();
+        ArrayList<Move> opponentMoves = new ArrayList<>();
         for(int y = 0; y < board.getBoardSize(); ++y){
             for(int x = 0; x < board.getBoardSize(); ++x){
                 Piece piece = cells[y][x].getPiece();
-                if(piece != null && piece.getColour() != playerColour)
-                        opponentMoves.addAll(piece.getPossibleMoves());
+                if(piece != null && piece.getColour() == opponentColour)
+                        opponentMoves.addAll(piece.getMoves());
             }
         }
-        if(!isPlayerChecked(cells, opponentColour, board.getBoardSize()))
+        if(!isPlayerChecked(board, opponentColour))
             return State.none;
+        Board afterMove = new Board(board);
+        Piece captured;
         for(Move opponentMove : opponentMoves){
-            System.out.println(opponentMove.before.y + " " + opponentMove.before.x + " " + opponentMove.after.y + " " + opponentMove.after.x);
-            Cell[][] afterMove = cells.clone();
-            Piece piece = cells[opponentMove.before.y][opponentMove.before.x].getPiece();
+            Piece piece = afterMove.getCells()[opponentMove.before.y][opponentMove.before.x].getPiece();
             Cell.Colour colour = piece.getColour();
-            afterMove[opponentMove.after.y][opponentMove.after.x].setPiece(piece);
-            afterMove[opponentMove.before.y][opponentMove.before.x].removePiece();
-            if(!isPlayerChecked(afterMove, colour, board.getBoardSize()))
+            captured = afterMove.getCells()[opponentMove.after.y][opponentMove.after.x].getPiece();
+            afterMove.getCells()[opponentMove.after.y][opponentMove.after.x].setPiece(piece);
+            afterMove.getCells()[opponentMove.before.y][opponentMove.before.x].removePiece();
+            if(!isPlayerChecked(afterMove, colour))
                 return State.check;
+            afterMove.getCells()[opponentMove.before.y][opponentMove.before.x].setPiece(afterMove.getCells()[opponentMove.after.y][opponentMove.after.x].getPiece());
+            afterMove.getCells()[opponentMove.after.y][opponentMove.after.x].setPiece(captured);
         }
         return State.checkmate;
     }
 
-    public static boolean isPlayerChecked(Cell[][] cells, Cell.Colour colour, int boardSize){
-        HashSet<Move> opponentMoves = new HashSet<>();
-        for(int y = 0; y < boardSize; ++y){
-            for(int x = 0; x < boardSize; ++x){
-                Piece piece = cells[y][x].getPiece();
+    public static boolean isPlayerChecked(Board board, Cell.Colour colour){
+        board.clearMoves();
+        ArrayList<Move> opponentMoves = new ArrayList<>();
+        for(int y = 0; y < board.getBoardSize(); ++y){
+            for(int x = 0; x < board.getBoardSize(); ++x){
+                Piece piece = board.getCells()[y][x].getPiece();
                 if(piece != null && piece.getColour() != colour)
-                        opponentMoves.addAll(piece.getPossibleMoves());
+                        opponentMoves.addAll(piece.getMoves());
             }
         }
         for(Move move : opponentMoves){
             int y = move.after.y;
             int x = move.after.x;
-            Piece piece = cells[y][x].getPiece();
-            if(piece instanceof King && piece.getColour() != colour)
+            Piece piece = board.getCells()[y][x].getPiece();
+            if(piece instanceof King && piece.getColour() == colour)
                 return true;
         }
         return false;

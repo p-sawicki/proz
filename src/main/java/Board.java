@@ -8,6 +8,7 @@ public class Board extends JPanel implements MouseListener {
     private final int windowHeight = 720;
     private final int windowWidth = 720;
     private final Dimension windowSize = new Dimension(windowWidth, windowHeight);
+    private final Cell.Colour bottomPlayerColour;
 
     private boolean whiteTurn;
     private Point clickedCellPosition = new Point(-1, -1);
@@ -29,16 +30,17 @@ public class Board extends JPanel implements MouseListener {
                     new King(Cell.Colour.black), new Bishop(Cell.Colour.black), new Knight(Cell.Colour.black), new Rook(Cell.Colour.black)}
     };
 
-    public Board(){
+    public Board(Cell.Colour bottomPlayerColour){
+        this.bottomPlayerColour = bottomPlayerColour;
         cells = new Cell[size][size];
         setLayout(new GridLayout(size, size, 0, 0));
 
         this.addMouseListener(this);
 
         Cell.Colour color = Cell.Colour.black;
-        for(int y = 0; y < size; ++y){
+        for(int y = size - 1; y >= 0; --y){
             for(int x = 0; x < size; ++x){
-                Cell cell = new Cell(color, this, new Point(y, x));
+                Cell cell = new Cell(color, this, new Point(x, y));
                 cells[y][x] = cell;
                 cell.board = this;
                 add(cell);
@@ -58,6 +60,26 @@ public class Board extends JPanel implements MouseListener {
         whiteTurn = true;
     }
 
+    public Board(Board board){
+        this.cells = new Cell[size][size];
+        this.bottomPlayerColour = board.bottomPlayerColour;
+        this.whiteTurn = board.whiteTurn;
+        this.clickedCellPosition = board.clickedCellPosition;
+
+        for(int y = 0; y < size; ++y){
+            for(int x = 0; x < size; ++x) {
+                this.cells[y][x] = new Cell(board.getCells()[y][x].getColour(), this, new Point(x, y));
+                Piece piece = board.getCells()[y][x].getPiece();
+                if(piece != null)
+                    this.cells[y][x].setPiece(piece.copy());
+            }
+        }
+    }
+
+    public Cell.Colour getBottomPlayerColour() {
+        return bottomPlayerColour;
+    }
+
     public Cell[][] getCells() {
         return cells;
     }
@@ -72,15 +94,20 @@ public class Board extends JPanel implements MouseListener {
         return size;
     }
 
-    public Cell[][] getCells(){
-        return cells;
-    }
-
     public void setPieces(Piece[][] pieces){
-        this.pieces = pieces;
         for(int y = 0; y < size; ++y){
             for(int x = 0; x < size; ++x)
                 cells[y][x].setPiece(pieces[y][x]);
+        }
+    }
+
+    public void clearMoves(){
+        for(int y = 0; y < size; ++y){
+            for(int x = 0; x < size; ++x){
+                Piece piece = cells[y][x].getPiece();
+                if(piece != null)
+                    piece.clearMoves();
+            }
         }
     }
 
@@ -102,8 +129,8 @@ public class Board extends JPanel implements MouseListener {
             return false;
         }
 
-        boolean moveable = start.getPiece().isAppropriateMove(destination);
-        if(moveable) {
+        boolean movable = start.getPiece().isAppropriateMove(destination);
+        if(movable) {
             Piece movedPiece = start.getPiece();
             start.removePiece();
             destination.setPiece(movedPiece);
@@ -157,6 +184,10 @@ public class Board extends JPanel implements MouseListener {
             }
             if(isMoved || isMoved2) {
                 System.out.println("One of the components was moved");
+                clearMoves();
+                Cell.Colour playerColour = whiteTurn ? Cell.Colour.white : Cell.Colour.black;
+                if(CheckDetector.isOpponentChecked(this, playerColour) == CheckDetector.State.checkmate)
+                    System.out.println("GAME OVER");
                 switchTurn();
                 // check for checkmate situation
             }
