@@ -10,7 +10,7 @@ public class GameWindow {
 
         window.setLayout(new BorderLayout(10, 10));
 
-        board = new Board();
+        board = new Board(Cell.Colour.white);
 
         window.add(board, BorderLayout.CENTER);
 
