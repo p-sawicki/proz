@@ -15,6 +15,7 @@ public class Board extends JPanel implements MouseListener {
     private boolean enableGame;
     private Point clickedCellPosition = new Point(-1, -1);
     private final Point nullPosition = new Point(-1, -1);
+    private boolean boardFlipped;
 
     //starting board state
     private final Piece[][] pieces = {
@@ -31,28 +32,51 @@ public class Board extends JPanel implements MouseListener {
             {new Rook(Cell.Colour.black), new Knight(Cell.Colour.black), new Bishop(Cell.Colour.black), new Queen(Cell.Colour.black),
                     new King(Cell.Colour.black), new Bishop(Cell.Colour.black), new Knight(Cell.Colour.black), new Rook(Cell.Colour.black)}
     };
-
     public Board(Cell.Colour bottomPlayerColour){
+        this(false, bottomPlayerColour);
+    }
+    public Board(){
+        this(false, Cell.Colour.white);
+    }
+    public Board(boolean boardFlipped, Cell.Colour bottomPlayerColour){
+        this.boardFlipped = boardFlipped;
         this.bottomPlayerColour = bottomPlayerColour;
         setBoardAltered(false);
         cells = new Cell[size][size];
         setLayout(new GridLayout(size, size, 0, 0));
 
         this.addMouseListener(this);
+        Cell.Colour color = Cell.Colour.black;
+        if(boardFlipped) {
+            for(int y = 0; y < size; ++y) {
+                for(int x = size - 1; x >= 0; --x) {
+                    Cell cell = new Cell(color, this, new Point(x, y));
+                    cells[y][x] = cell;
+                    cell.board = this;
+                    add(cell);
 
-        Cell.Colour color = Cell.Colour.white;
-        for(int y = size - 1; y >= 0; --y){
-            for(int x = 0; x < size; ++x){
-                Cell cell = new Cell(color, this, new Point(x, y));
-                cells[y][x] = cell;
-                cell.board = this;
-                add(cell);
+                    if(pieces[y][x] != null)
+                        cell.setPiece(pieces[y][x]);
 
-                if(pieces[y][x] != null)
-                    cell.setPiece(pieces[y][x]);
+                    if(x != size - 1)
+                        color = color == Cell.Colour.black ? Cell.Colour.white : Cell.Colour.black;
+                }
+            }
+        }
+        else {
+            for (int y = size - 1; y >= 0; --y) {
+                for (int x = 0; x < size; ++x) {
+                    Cell cell = new Cell(color, this, new Point(x, y));
+                    cells[y][x] = cell;
+                    cell.board = this;
+                    add(cell);
 
-                if(x != size - 1)
-                    color = color == Cell.Colour.black ? Cell.Colour.white : Cell.Colour.black;
+                    if (pieces[y][x] != null)
+                        cell.setPiece(pieces[y][x]);
+
+                    if (x != size - 1)
+                        color = color == Cell.Colour.black ? Cell.Colour.white : Cell.Colour.black;
+                }
             }
         }
 
