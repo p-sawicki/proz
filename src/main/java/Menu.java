@@ -22,7 +22,7 @@ public class Menu implements Runnable{
         setBackgroundImage(menuWindow);
         addButtons(menuWindow);
     }
-
+    
     private void setBackgroundImage(JFrame window) {
         try {
             window.setContentPane(
