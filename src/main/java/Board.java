@@ -16,6 +16,7 @@ public class Board extends JPanel implements MouseListener {
     private Point clickedCellPosition = new Point(-1, -1);
     private final Point nullPosition = new Point(-1, -1);
     private boolean boardFlipped;
+    private ConnectionHandler connectionHandler;
 
     //starting board state
     private final Piece[][] pieces = {
@@ -58,7 +59,7 @@ public class Board extends JPanel implements MouseListener {
                     if(pieces[y][x] != null)
                         cell.setPiece(pieces[y][x]);
 
-                    if(x != size - 1)
+                    if(x != 0)
                         color = color == Cell.Colour.black ? Cell.Colour.white : Cell.Colour.black;
                 }
             }
@@ -161,6 +162,10 @@ public class Board extends JPanel implements MouseListener {
         }
     }
 
+    public void setConnectionHandler(ConnectionHandler connectionHandler){
+        this.connectionHandler = connectionHandler;
+    }
+
     public boolean moveIfPossible(Cell start, Cell destination){ // moves piece if not contradicted by rules
         System.out.println("moveIfPossible function called for element " + start.getPieceNameColor()
                 + " from cell X:" + start.getPosition().x + ", Y:" + start.getPosition().y
@@ -237,6 +242,21 @@ public class Board extends JPanel implements MouseListener {
                             "GAME OVER",
                             "End of game",
                             JOptionPane.INFORMATION_MESSAGE);
+                }
+                Move move = new Move(cells[prevY][prevX].getPosition(), clicked.getPosition());
+                CheckDetector.State state = CheckDetector.isOpponentChecked(this, playerColour);
+                if(state == CheckDetector.State.checkmate)
+                    System.out.println("YOU WON");
+                Message message = new Message(move, state);
+                if(connectionHandler != null) {
+                    connectionHandler.send(message);
+                    message = connectionHandler.receive();
+                    cells[message.move.after.y][message.move.after.x].setPiece(cells[message.move.before.y][message.move.before.x].getPiece());
+                    cells[message.move.before.y][message.move.before.x].setPiece(null);
+                    if(message.state == CheckDetector.State.check)
+                        System.out.println("CHECKED");
+                    else if(message.state == CheckDetector.State.checkmate)
+                        System.out.println("YOU LOST");
                 }
                 switchTurn();
                 if(!isBoardAltered) { // board was not altered yet
