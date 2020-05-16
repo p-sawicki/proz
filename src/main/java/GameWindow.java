@@ -150,4 +150,8 @@ public class GameWindow {
     public boolean checkIfBoardWasAltered() {
         return board.checkIfBoardAltered();
     }
+
+    public Board getBoard() {
+        return board;
+    }
 }
