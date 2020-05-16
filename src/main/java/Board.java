@@ -8,8 +8,8 @@ public class Board extends JPanel implements MouseListener {
     private final int windowHeight = 720;
     private final int windowWidth = 720;
     private final Dimension windowSize = new Dimension(windowWidth, windowHeight);
-    private final Cell.Colour bottomPlayerColour;
     private boolean isBoardAltered; // true if current board state isn't saved
+    private final Cell.Colour playerColour;
 
     private boolean whiteTurn;
     private boolean enableGame;
@@ -33,16 +33,16 @@ public class Board extends JPanel implements MouseListener {
             {new Rook(Cell.Colour.black), new Knight(Cell.Colour.black), new Bishop(Cell.Colour.black), new Queen(Cell.Colour.black),
                     new King(Cell.Colour.black), new Bishop(Cell.Colour.black), new Knight(Cell.Colour.black), new Rook(Cell.Colour.black)}
     };
-    public Board(Cell.Colour bottomPlayerColour){
-        this(false, bottomPlayerColour);
+    public Board(Cell.Colour playerColour){
+        this(false, playerColour);
     }
     public Board(){
         this(false, Cell.Colour.white);
     }
-    public Board(boolean boardFlipped, Cell.Colour bottomPlayerColour){
+    public Board(boolean boardFlipped, Cell.Colour playerColour){
         this.boardFlipped = boardFlipped;
-        this.bottomPlayerColour = bottomPlayerColour;
         setBoardAltered(false);
+        this.playerColour = playerColour;
         cells = new Cell[size][size];
         setLayout(new GridLayout(size, size, 0, 0));
 
@@ -87,11 +87,21 @@ public class Board extends JPanel implements MouseListener {
 
         whiteTurn = true;
         enableGame = true;
+        if(playerColour == Cell.Colour.black){
+            Message message = connectionHandler.receive();
+            cells[message.move.after.y][message.move.after.x].setPiece(cells[message.move.before.y][message.move.before.x].getPiece());
+            cells[message.move.before.y][message.move.before.x].setPiece(null);
+            if(message.state == CheckDetector.State.check)
+                System.out.println("CHECKED");
+            else if(message.state == CheckDetector.State.checkmate)
+                System.out.println("YOU LOST");
+            whiteTurn = false;
+        }
     }
 
     public Board(Board board){
         this.cells = new Cell[size][size];
-        this.bottomPlayerColour = board.bottomPlayerColour;
+        this.playerColour = board.playerColour;
         this.whiteTurn = board.whiteTurn;
         this.enableGame = board.enableGame;
         this.clickedCellPosition = board.clickedCellPosition;
@@ -107,8 +117,8 @@ public class Board extends JPanel implements MouseListener {
         }
     }
 
-    public Cell.Colour getBottomPlayerColour() {
-        return bottomPlayerColour;
+    public Cell.Colour getPlayerColour() {
+        return playerColour;
     }
 
     public Cell[][] getCells() {

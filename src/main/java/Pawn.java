@@ -34,7 +34,7 @@ public class Pawn extends Piece{
         Point start = cell.getPosition();
         int y = start.y;
         int x = start.x;
-        if(colour != cell.getBoard().getBottomPlayerColour()) {
+        if(colour == Cell.Colour.black) {
             if (y == 6 && cell.getBoard().getCells()[y - 2][x].getPiece() == null)
                 moves.add(new Move(start, new Point(x, y - 2)));
             if (y - 1 >= 0) {
