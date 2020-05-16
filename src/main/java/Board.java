@@ -37,7 +37,7 @@ public class Board extends JPanel implements MouseListener {
 
         this.addMouseListener(this);
 
-        Cell.Colour color = Cell.Colour.black;
+        Cell.Colour color = Cell.Colour.white;
         for(int y = size - 1; y >= 0; --y){
             for(int x = 0; x < size; ++x){
                 Cell cell = new Cell(color, this, new Point(x, y));
