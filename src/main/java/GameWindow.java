@@ -16,11 +16,9 @@ public class GameWindow {
 
     public GameWindow(String playerName){
         window = new JFrame("Chess");
-
         window.setLayout(new BorderLayout(10, 10));
 
         board = new Board(Cell.Colour.white, this);
-
         setPlayerName(playerName);
 
         isBoardAltered = false;
@@ -37,7 +35,6 @@ public class GameWindow {
                 }
             }
         });
-
         window.setVisible(true);
 
         initializeGameMenuBar(window);

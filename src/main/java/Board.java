@@ -12,10 +12,11 @@ public class Board extends JPanel implements MouseListener {
     private final GameWindow gameWindow;
 
     private boolean whiteTurn;
+    private boolean enableGame;
     private Point clickedCellPosition = new Point(-1, -1);
     private final Point nullPosition = new Point(-1, -1);
 
-    //starting board state for testing
+    //starting board state
     private final Piece[][] pieces = {
             {new Rook(Cell.Colour.white), new Knight(Cell.Colour.white), new Bishop(Cell.Colour.white), new Queen(Cell.Colour.white),
                     new King(Cell.Colour.white), new Bishop(Cell.Colour.white), new Knight(Cell.Colour.white), new Rook(Cell.Colour.white)},
@@ -60,12 +61,14 @@ public class Board extends JPanel implements MouseListener {
         setSize(windowSize);
 
         whiteTurn = true;
+        enableGame = true;
     }
 
     public Board(Board board, GameWindow window){
         this.cells = new Cell[size][size];
         this.bottomPlayerColour = board.bottomPlayerColour;
         this.whiteTurn = board.whiteTurn;
+        this.enableGame = board.enableGame;
         this.clickedCellPosition = board.clickedCellPosition;
         this.gameWindow = window;
 
@@ -91,6 +94,10 @@ public class Board extends JPanel implements MouseListener {
         this.whiteTurn = !this.whiteTurn;
         String currentTurn = whiteTurn ? "White" : "Black";
         System.out.println(currentTurn + " turn");
+    }
+
+    private void disableGame() {
+        enableGame = false;
     }
 
     public int getBoardSize() {
@@ -150,6 +157,8 @@ public class Board extends JPanel implements MouseListener {
     //@Override
     // this function is invoked when the mouse button has been clicked (pressed and released) on a component
     public void mouseClicked(MouseEvent e){
+        if(!enableGame) // disables moves if there was a checkmate
+            return;
         Cell clicked = (Cell) getComponentAt(new Point(e.getX(), e.getY()));
         Point clickedPosition = clicked.getPosition();
         boolean isMoved = false, isMoved2 = false;
@@ -193,8 +202,15 @@ public class Board extends JPanel implements MouseListener {
                 System.out.println("One of the components was moved");
                 clearMoves();
                 Cell.Colour playerColour = whiteTurn ? Cell.Colour.white : Cell.Colour.black;
-                if(CheckDetector.isOpponentChecked(this, playerColour) == CheckDetector.State.checkmate)
+                if(CheckDetector.isOpponentChecked(this, playerColour) == CheckDetector.State.checkmate) {
+                    disableGame();
                     System.out.println("GAME OVER");
+                    final JFrame warningWindow = new JFrame();
+                    JOptionPane.showMessageDialog(warningWindow,
+                            "GAME OVER",
+                            "End of game",
+                            JOptionPane.INFORMATION_MESSAGE);
+                }
                 switchTurn();
                 if(!gameWindow.checkIfBoardWasAltered()) { // board was not altered yet
                     gameWindow.setBoardAltered(); // sets board status as altered
