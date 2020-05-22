@@ -111,8 +111,12 @@ public class Menu implements Runnable{
             }
             String opponentIP = ipField.getText();
 
-            //new GameWindow(playerName, opponentIP);
             new GameWindow(playerName);
+            // setConnectionHandler with opponentIP;
+             /*if(opponentISNotReady) {
+                System.out.println("opponent not ready");
+                return;
+            }*/
             gameParametersWindow.dispose();
         });
     }
@@ -130,7 +134,7 @@ public class Menu implements Runnable{
         JLabel nameField = new JLabel(playerName);
         JLabel enterIPLabel = new JLabel("  Opponent IP:");
         JLabel ipField = new JLabel(opponentIP);
-        JLabel spacerLabel = new JLabel("");
+        JLabel spacerLabel = new JLabel(""); // Here can be opponent status (like: Opponent is active; Opponent is ready)
         JButton startButton = new JButton("Start");
 
         gameParametersWindow.add(enterNameLabel);
@@ -142,11 +146,13 @@ public class Menu implements Runnable{
 
         // button listener
         startButton.addActionListener(e -> {
-
-            // add exception cases
-
-            //new GameWindow(playerName, opponentIP, board);
+            //new GameWindow(playerName, board);
             new GameWindow(playerName);
+            // setConnectionHandler with opponentIP;
+            /*if(opponentISNotReady) {
+                System.out.println("opponent not ready");
+                return;
+            }*/
             gameParametersWindow.dispose();
         });
     }
@@ -155,7 +161,6 @@ public class Menu implements Runnable{
         // fileChooser parameters
         JFileChooser jfc = new JFileChooser(FileSystemView.getFileSystemView().getHomeDirectory());
         jfc.setDialogTitle("Choose a saved game to resume: ");
-        //jfc.setFileSelectionMode(JFileChooser.FILES_ONLY); // default setting
         jfc.setAcceptAllFileFilterUsed(false); // restricts file selection to extensions declared below
         FileNameExtensionFilter filter = new FileNameExtensionFilter("XML files", "xml");
         jfc.addChoosableFileFilter(filter);

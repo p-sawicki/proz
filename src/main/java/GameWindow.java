@@ -5,6 +5,7 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.File;
+import java.util.Arrays;
 //import java.time.LocalDateTime;
 
 
@@ -12,16 +13,14 @@ public class GameWindow {
     private JFrame window;
     private Board board;
     private String playerName;
-    private boolean isBoardAltered;
 
     public GameWindow(String playerName){
         window = new JFrame("Chess");
         window.setLayout(new BorderLayout(10, 10));
 
-        board = new Board(Cell.Colour.white, this);
+        board = new Board(Cell.Colour.white);
         setPlayerName(playerName);
 
-        isBoardAltered = false;
         window.add(board, BorderLayout.CENTER);
 
         window.pack();
@@ -77,43 +76,51 @@ public class GameWindow {
     }
 
     private void saveGame() {
-        // fileChooser parameters
-        JFileChooser jfc = new JFileChooser(FileSystemView.getFileSystemView().getHomeDirectory());
-        jfc.setDialogTitle("Choose a folder and file name to save game: ");
-        //jfc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-        jfc.setAcceptAllFileFilterUsed(false); // restricts file formats to those declared below
-        FileNameExtensionFilter filter = new FileNameExtensionFilter("XML files", "xml");
-        jfc.addChoosableFileFilter(filter);
-
+        JFileChooser fileChooser = createFileChooser();
+        fileChooser.setSelectedFile(new File("chessGame_" + java.time.LocalDate.now()));
 /*
         System.out.println("Project Directory : "+ System.getProperty("user.dir"));
         String gameDirectory = System.getProperty("user.dir");
-        jfc.setSelectedFile(new File(gameDirectory + "/" + "chessGame_" + java.time.LocalDate.now() + ".xml")); // sets game folder as default to save file in
+        jfc.setSelectedFile(new File(gameDirectory + "/" + "chessGame_" + java.time.LocalDate.now())); // sets game folder as default to save file in
 */
-        jfc.setSelectedFile(new File("chessGame_" + java.time.LocalDate.now() + ".xml"));
-        int returnValue = jfc.showSaveDialog(null);
-        if (returnValue == JFileChooser.APPROVE_OPTION) {
-            File selectedFile = jfc.getSelectedFile();
-            System.out.println("player has chosen to save game at: " + selectedFile.getAbsolutePath());
-
-            // check for ".xml" extension
-            String fileExtension = getfileExtension(jfc.getSelectedFile());
-            if(!fileExtension.equals("xml")) {
-                System.out.println("player has chosen file with wrong extension");
-                return;
+        int returnValue = fileChooser.showSaveDialog(null);
+        if(returnValue == JFileChooser.APPROVE_OPTION) {
+            File selectedFile = fileChooser.getSelectedFile();
+            if (!selectedFile.exists() || ignoredWarning("Do you want to overwrite data in file?")) { // prevents overwriting existing file without player consent
+                String fileName = getFileName(fileChooser);
+                //
+                // save game state to xml file /////////////////////////////
+                // saveGame(fileName);
+                //if(successful save)
+                    board.setBoardAltered(false);
+                //
             }
-
-            //
-            // save game state to xml file /////////////////////////////
-            //
-
-            //if(successful save)
-                isBoardAltered = false;
         }
+    }
 
-        if (returnValue == JFileChooser.CANCEL_OPTION) {
-            return;
-        }
+    public JFileChooser createFileChooser() {
+        // fileChooser parameters
+        JFileChooser fileChooser = new JFileChooser(FileSystemView.getFileSystemView().getHomeDirectory());
+        fileChooser.setDialogTitle("Choose a folder and file name to save game: ");
+        //jfc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+        fileChooser.setAcceptAllFileFilterUsed(false); // restricts file formats to those declared below
+        FileNameExtensionFilter filterXML = new FileNameExtensionFilter("XML files", "xml");
+        fileChooser.addChoosableFileFilter(filterXML);
+        return  fileChooser;
+    }
+
+    public String getFileName(JFileChooser fileChooser) {
+        File selectedFile = fileChooser.getSelectedFile();
+        String selectedFileName = selectedFile.getAbsolutePath();
+
+        System.out.println("Player has chosen to save game at: " + selectedFileName);
+        FileNameExtensionFilter fileFilter = (FileNameExtensionFilter)fileChooser.getFileFilter();
+        System.out.println("Accepted extensions: " + Arrays.toString(fileFilter.getExtensions()));
+        if (!fileFilter.accept(selectedFile))
+            selectedFileName = selectedFileName + "." + fileFilter.getExtensions()[0];
+        System.out.println("Game will be saved at: " + selectedFileName);
+
+        return selectedFileName;
     }
 
     public JFrame createWarningWindow() {
@@ -141,19 +148,6 @@ public class GameWindow {
     }
 
     public boolean checkIfBoardWasAltered() {
-        return isBoardAltered;
+        return board.checkIfBoardAltered();
     }
-
-    public void setBoardAltered() {
-        isBoardAltered = true;
-    }
-
-    private static String getfileExtension(File file) {
-        String filename = file.getName();
-        if(filename.lastIndexOf(".") != -1 && filename.lastIndexOf(".") != 0)
-            return filename.substring(filename.lastIndexOf(".") + 1);
-        else
-            return "";
-    }
-
 }

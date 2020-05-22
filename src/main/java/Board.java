@@ -9,7 +9,7 @@ public class Board extends JPanel implements MouseListener {
     private final int windowWidth = 720;
     private final Dimension windowSize = new Dimension(windowWidth, windowHeight);
     private final Cell.Colour bottomPlayerColour;
-    private final GameWindow gameWindow;
+    private boolean isBoardAltered; // true if current board state isn't saved
 
     private boolean whiteTurn;
     private boolean enableGame;
@@ -32,9 +32,9 @@ public class Board extends JPanel implements MouseListener {
                     new King(Cell.Colour.black), new Bishop(Cell.Colour.black), new Knight(Cell.Colour.black), new Rook(Cell.Colour.black)}
     };
 
-    public Board(Cell.Colour bottomPlayerColour, GameWindow window){
+    public Board(Cell.Colour bottomPlayerColour){
         this.bottomPlayerColour = bottomPlayerColour;
-        this.gameWindow = window;
+        setBoardAltered(false);
         cells = new Cell[size][size];
         setLayout(new GridLayout(size, size, 0, 0));
 
@@ -64,13 +64,13 @@ public class Board extends JPanel implements MouseListener {
         enableGame = true;
     }
 
-    public Board(Board board, GameWindow window){
+    public Board(Board board){
         this.cells = new Cell[size][size];
         this.bottomPlayerColour = board.bottomPlayerColour;
         this.whiteTurn = board.whiteTurn;
         this.enableGame = board.enableGame;
         this.clickedCellPosition = board.clickedCellPosition;
-        this.gameWindow = window;
+        setBoardAltered(false);
 
         for(int y = 0; y < size; ++y){
             for(int x = 0; x < size; ++x) {
@@ -104,8 +104,11 @@ public class Board extends JPanel implements MouseListener {
         return size;
     }
 
-    public GameWindow getGameWindow() {
-        return gameWindow;
+    public boolean checkIfBoardAltered() {
+        return isBoardAltered;
+    }
+    public void setBoardAltered(boolean isAltered) {
+        isBoardAltered = isAltered;
     }
 
     public void setPieces(Piece[][] pieces){
@@ -212,8 +215,8 @@ public class Board extends JPanel implements MouseListener {
                             JOptionPane.INFORMATION_MESSAGE);
                 }
                 switchTurn();
-                if(!gameWindow.checkIfBoardWasAltered()) { // board was not altered yet
-                    gameWindow.setBoardAltered(); // sets board status as altered
+                if(!isBoardAltered) { // board was not altered yet
+                    setBoardAltered(true); // sets board status as altered
                 }
             }
         }
