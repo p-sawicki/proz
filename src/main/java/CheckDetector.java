@@ -17,7 +17,7 @@ public class CheckDetector {
         }
         if(!isPlayerChecked(board, opponentColour))
             return State.none;
-        Board afterMove = new Board(board);
+        Board afterMove = new Board(board, board.getGameWindow());
         Piece captured;
         for(Move opponentMove : opponentMoves){
             Piece piece = afterMove.getCells()[opponentMove.before.y][opponentMove.before.x].getPiece();

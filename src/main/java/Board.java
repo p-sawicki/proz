@@ -9,6 +9,7 @@ public class Board extends JPanel implements MouseListener {
     private final int windowWidth = 720;
     private final Dimension windowSize = new Dimension(windowWidth, windowHeight);
     private final Cell.Colour bottomPlayerColour;
+    private final GameWindow gameWindow;
 
     private boolean whiteTurn;
     private Point clickedCellPosition = new Point(-1, -1);
@@ -30,8 +31,9 @@ public class Board extends JPanel implements MouseListener {
                     new King(Cell.Colour.black), new Bishop(Cell.Colour.black), new Knight(Cell.Colour.black), new Rook(Cell.Colour.black)}
     };
 
-    public Board(Cell.Colour bottomPlayerColour){
+    public Board(Cell.Colour bottomPlayerColour, GameWindow window){
         this.bottomPlayerColour = bottomPlayerColour;
+        this.gameWindow = window;
         cells = new Cell[size][size];
         setLayout(new GridLayout(size, size, 0, 0));
 
@@ -60,11 +62,12 @@ public class Board extends JPanel implements MouseListener {
         whiteTurn = true;
     }
 
-    public Board(Board board){
+    public Board(Board board, GameWindow window){
         this.cells = new Cell[size][size];
         this.bottomPlayerColour = board.bottomPlayerColour;
         this.whiteTurn = board.whiteTurn;
         this.clickedCellPosition = board.clickedCellPosition;
+        this.gameWindow = window;
 
         for(int y = 0; y < size; ++y){
             for(int x = 0; x < size; ++x) {
@@ -92,6 +95,10 @@ public class Board extends JPanel implements MouseListener {
 
     public int getBoardSize() {
         return size;
+    }
+
+    public GameWindow getGameWindow() {
+        return gameWindow;
     }
 
     public void setPieces(Piece[][] pieces){
@@ -189,7 +196,9 @@ public class Board extends JPanel implements MouseListener {
                 if(CheckDetector.isOpponentChecked(this, playerColour) == CheckDetector.State.checkmate)
                     System.out.println("GAME OVER");
                 switchTurn();
-                // check for checkmate situation
+                if(!gameWindow.checkIfBoardWasAltered()) { // board was not altered yet
+                    gameWindow.setBoardAltered(); // sets board status as altered
+                }
             }
         }
         repaint();
