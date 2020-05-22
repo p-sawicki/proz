@@ -1,11 +1,11 @@
 import java.util.ArrayList;
 
-public class Rook extends Piece{
+public class Rook extends Piece {
     public Rook(Cell.Colour colour) {
         super(colour);
     }
 
-    public Piece copy(){
+    public Piece copy() {
         return new Rook(colour);
     }
 

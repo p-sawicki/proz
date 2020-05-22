@@ -6,7 +6,7 @@ public class Knight extends Piece {
         super(colour);
     }
 
-    public Piece copy(){
+    public Piece copy() {
         return new Knight(colour);
     }
 

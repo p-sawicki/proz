@@ -7,29 +7,38 @@ import javax.imageio.ImageIO;
 import java.io.IOException;
 
 
-public class Menu implements Runnable{
+public class Menu implements Runnable {
     private final int windowHeight = 720;
     private final int windowWidth = 720;
     private final Dimension windowSize = new Dimension(windowWidth, windowHeight);
+    private MenuConnectionHandler menuConnectionHandler;
+    private JFrame menuWindow;
 
-    public void run(){
+    public void run() {
         // window parameters
-        final JFrame menuWindow = new JFrame("Menu");
+        menuWindow = new JFrame("Menu");
         menuWindow.setSize(windowSize);
         menuWindow.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         menuWindow.setVisible(true);
 
+        if (menuConnectionHandler == null) {
+            menuConnectionHandler = new MenuConnectionHandler(this);
+            menuConnectionHandler.start();
+        } else
+            menuConnectionHandler.resumeReceiving();
+
         setBackgroundImage(menuWindow);
         addButtons(menuWindow);
     }
-    
+
     private void setBackgroundImage(JFrame window) {
         try {
             window.setContentPane(
                     new JLabel(new ImageIcon(ImageIO.read(new File("src/main/resources/alpha/alpha/320/menuBackground.png")))));
         } catch (IOException e) {
             System.out.println("Could not open image: " + e.getMessage());
-        };
+        }
+        ;
     }
 
     private void addButtons(JFrame window) { // initialize button panel menu
@@ -46,7 +55,7 @@ public class Menu implements Runnable{
             window.dispose();
         });
         openGameButton.addActionListener(e -> { // new window must show up with saved games to choose from
-            if(openSavedGame()) { // saved game was successfully resumed
+            if (openSavedGame()) { // saved game was successfully resumed
                 //window.dispose();
             }
         });
@@ -59,7 +68,7 @@ public class Menu implements Runnable{
 
         // initialize button panel
         JPanel buttonPanel = new JPanel();
-        buttonPanel.setLayout(new GridLayout(4,1));
+        buttonPanel.setLayout(new GridLayout(4, 1));
         buttonPanel.setSize(new Dimension(200, 200));
         buttonPanel.setLocation(260, 300);
         buttonPanel.setVisible(true);
@@ -85,7 +94,7 @@ public class Menu implements Runnable{
         gameParametersWindow.setSize(new Dimension(400, 100));
         gameParametersWindow.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         gameParametersWindow.setVisible(true);
-        gameParametersWindow.setLayout(new GridLayout(3,2));
+        gameParametersWindow.setLayout(new GridLayout(3, 2));
 
         // window objects
         JLabel enterNameLabel = new JLabel("  Please enter your name:");
@@ -105,13 +114,14 @@ public class Menu implements Runnable{
         // button listener
         startButton.addActionListener(e -> {
             String playerName = nameField.getText();
-            if(playerName.equals("")) {
+            if (playerName.equals("")) {
                 System.out.println("player hasn't entered his name");
                 return;
             }
             String opponentIP = ipField.getText();
+            menuConnectionHandler.challenge(playerName, opponentIP);
 
-            new GameWindow(playerName);
+            new GameWindow(playerName, Cell.Colour.white, new ConnectionHandler(opponentIP, null), menuConnectionHandler);
             // setConnectionHandler with opponentIP;
              /*if(opponentISNotReady) {
                 System.out.println("opponent not ready");
@@ -127,7 +137,7 @@ public class Menu implements Runnable{
         gameParametersWindow.setSize(new Dimension(400, 100));
         gameParametersWindow.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         gameParametersWindow.setVisible(true);
-        gameParametersWindow.setLayout(new GridLayout(3,2));
+        gameParametersWindow.setLayout(new GridLayout(3, 2));
 
         // window objects
         JLabel enterNameLabel = new JLabel("  Your name:");
@@ -188,5 +198,12 @@ public class Menu implements Runnable{
                 "\n" + "Program title: \"Chess\"" + "\n\n" + "Version: 1.0" + "\n\n" + "Authors: Piotr Sawicki, Vladyslav Kyryk" + "\n",
                 "About program",
                 JOptionPane.INFORMATION_MESSAGE, icon);
+    }
+
+    public void onOpponentChallenge(String name, String address) {
+        System.out.println("opponent " + name + " connected from " + address);
+
+        new GameWindow("test", Cell.Colour.black, new ConnectionHandler(address, null), menuConnectionHandler);
+        menuWindow.dispose();
     }
 }

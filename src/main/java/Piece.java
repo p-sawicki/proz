@@ -20,6 +20,7 @@ public abstract class Piece {
         }
         possibleMoves = new ArrayList<>();
     }
+
     public abstract Piece copy();
 
     public void draw(Graphics g) {
@@ -30,11 +31,11 @@ public abstract class Piece {
         this.cell = cell;
     }
 
-    public Cell getCell(){
+    public Cell getCell() {
         return cell;
     }
 
-    public void clearMoves(){
+    public void clearMoves() {
         possibleMoves.clear();
     }
 
@@ -56,10 +57,10 @@ public abstract class Piece {
         return possibleMoves;
     }
 
-    private boolean addIfLegal(ArrayList<Move> moves, Point start, int x, int y){
+    private boolean addIfLegal(ArrayList<Move> moves, Point start, int x, int y) {
         Piece piece = cell.getBoard().getCells()[y][x].getPiece();
         if (piece != null) {
-            if(piece.getColour() != colour)
+            if (piece.getColour() != colour)
                 moves.add(new Move(start, piece.getCell().getPosition()));
             return false;
         }
@@ -72,16 +73,20 @@ public abstract class Piece {
         Point start = cell.getPosition();
         int y = start.y - 1;
         int x = start.x - 1;
-        while (y >= 0 && x >= 0 && addIfLegal(moves, start, x--, y--)) { }
+        while (y >= 0 && x >= 0 && addIfLegal(moves, start, x--, y--)) {
+        }
         y = start.y - 1;
         x = start.x + 1;
-        while (y >= 0 && x < cell.getBoard().getBoardSize() && addIfLegal(moves, start, x++, y--)) { }
+        while (y >= 0 && x < cell.getBoard().getBoardSize() && addIfLegal(moves, start, x++, y--)) {
+        }
         y = start.y + 1;
         x = start.x - 1;
-        while (y < cell.getBoard().getBoardSize() && x >= 0 && addIfLegal(moves, start, x--, y++)) { }
+        while (y < cell.getBoard().getBoardSize() && x >= 0 && addIfLegal(moves, start, x--, y++)) {
+        }
         y = start.y + 1;
         x = start.x + 1;
-        while (y < cell.getBoard().getBoardSize() && x < cell.getBoard().getBoardSize() && addIfLegal(moves, start, x++, y++)) { }
+        while (y < cell.getBoard().getBoardSize() && x < cell.getBoard().getBoardSize() && addIfLegal(moves, start, x++, y++)) {
+        }
         return moves;
     }
 
@@ -89,8 +94,10 @@ public abstract class Piece {
         ArrayList<Move> moves = new ArrayList<>();
         Point start = cell.getPosition();
         int x = start.x;
-        for (int y = cell.getPosition().y - 1; y >= 0 && addIfLegal(moves, start, x, y); --y) {}
-        for (int y = cell.getPosition().y + 1; y < cell.getBoard().getBoardSize() && addIfLegal(moves, start, x, y); ++y) { }
+        for (int y = cell.getPosition().y - 1; y >= 0 && addIfLegal(moves, start, x, y); --y) {
+        }
+        for (int y = cell.getPosition().y + 1; y < cell.getBoard().getBoardSize() && addIfLegal(moves, start, x, y); ++y) {
+        }
         return moves;
     }
 
@@ -98,8 +105,10 @@ public abstract class Piece {
         ArrayList<Move> moves = new ArrayList<>();
         Point start = cell.getPosition();
         int y = start.y;
-        for (int x = cell.getPosition().x - 1; x >= 0 && addIfLegal(moves, start, x, y); --x) { }
-        for (int x = cell.getPosition().x + 1; x < cell.getBoard().getBoardSize() && addIfLegal(moves, start, x, y); ++x) { }
+        for (int x = cell.getPosition().x - 1; x >= 0 && addIfLegal(moves, start, x, y); --x) {
+        }
+        for (int x = cell.getPosition().x + 1; x < cell.getBoard().getBoardSize() && addIfLegal(moves, start, x, y); ++x) {
+        }
         return moves;
     }
 
@@ -109,8 +118,8 @@ public abstract class Piece {
 
     protected abstract ArrayList<Move> getPossibleMoves();
 
-    public ArrayList<Move> getMoves(){
-        if(possibleMoves.isEmpty())
+    public ArrayList<Move> getMoves() {
+        if (possibleMoves.isEmpty())
             possibleMoves = getPossibleMoves();
         return possibleMoves;
     }
@@ -119,15 +128,15 @@ public abstract class Piece {
         return new File("src/main/resources/alpha/alpha/320/" + getColourAsString() + getName() + ".png");
     }
 
-    protected String getColourAsString(){
+    protected String getColourAsString() {
         return colour == Cell.Colour.black ? "Black" : "White";
     }
 
     public abstract String getName();
 
     public boolean isAppropriateMove(Cell destination) { //checks if piece selected by player can be moved to selected cell
-        for(Move move : getMoves())
-            if(move.after.x == destination.getPosition().x && move.after.y == destination.getPosition().y)
+        for (Move move : getMoves())
+            if (move.after.x == destination.getPosition().x && move.after.y == destination.getPosition().y)
                 return true;
         return false;
     }

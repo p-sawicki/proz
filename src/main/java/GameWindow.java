@@ -13,12 +13,22 @@ public class GameWindow {
     private JFrame window;
     private Board board;
     private String playerName;
+    private final ConnectionHandler connectionHandler;
 
-    public GameWindow(String playerName){
+    public GameWindow(String playerName) {
+        this(playerName, Cell.Colour.white, null, null);
+    }
+
+    public GameWindow(String playerName, Cell.Colour playerColour, ConnectionHandler connectionHandler, MenuConnectionHandler menuConnectionHandler) {
         window = new JFrame("Chess");
         window.setLayout(new BorderLayout(10, 10));
 
-        board = new Board(Cell.Colour.white);
+        this.connectionHandler = connectionHandler;
+
+        if (menuConnectionHandler != null)
+            menuConnectionHandler.stopReceiving();
+
+        board = new Board(playerColour, connectionHandler);
         setPlayerName(playerName);
 
         window.add(board, BorderLayout.CENTER);
@@ -28,8 +38,7 @@ public class GameWindow {
         window.addWindowListener(new WindowAdapter() {
             @Override
             public void windowClosing(WindowEvent e) {
-                if(ignoredWarning("Do you want to exit game?"))
-                {
+                if (ignoredWarning("Do you want to exit game?")) {
                     System.exit(0);
                 }
             }
@@ -51,18 +60,18 @@ public class GameWindow {
         goBackToMenuButton.addActionListener(e -> {
             // if at least 1 move was made, ask player if he wants to exit a game without save
             // if he is playing with another player then notify another player
-            if(!checkIfBoardWasAltered() || ignoredWarning("Do you want to exit game without saving?"))
-            {
+            if (!checkIfBoardWasAltered() || ignoredWarning("Do you want to exit game without saving?")) {
                 SwingUtilities.invokeLater(new Menu());
                 window.dispose();
+                if (connectionHandler != null)
+                    connectionHandler.stopReceiving();
             }
         });
         saveGameButton.addActionListener(e -> {
             saveGame(); // save current game
         });
         quitGameButton.addActionListener(e -> {
-            if(!checkIfBoardWasAltered() || ignoredWarning("Do you want to exit game without saving?"))
-            {
+            if (!checkIfBoardWasAltered() || ignoredWarning("Do you want to exit game without saving?")) {
                 System.exit(0);
             }
         });
@@ -84,7 +93,7 @@ public class GameWindow {
         jfc.setSelectedFile(new File(gameDirectory + "/" + "chessGame_" + java.time.LocalDate.now())); // sets game folder as default to save file in
 */
         int returnValue = fileChooser.showSaveDialog(null);
-        if(returnValue == JFileChooser.APPROVE_OPTION) {
+        if (returnValue == JFileChooser.APPROVE_OPTION) {
             File selectedFile = fileChooser.getSelectedFile();
             if (!selectedFile.exists() || ignoredWarning("Do you want to overwrite data in file?")) { // prevents overwriting existing file without player consent
                 String fileName = getFileName(fileChooser);
@@ -92,7 +101,7 @@ public class GameWindow {
                 // save game state to xml file /////////////////////////////
                 // saveGame(fileName);
                 //if(successful save)
-                    board.setBoardAltered(false);
+                board.setBoardAltered(false);
                 //
             }
         }
@@ -106,7 +115,7 @@ public class GameWindow {
         fileChooser.setAcceptAllFileFilterUsed(false); // restricts file formats to those declared below
         FileNameExtensionFilter filterXML = new FileNameExtensionFilter("XML files", "xml");
         fileChooser.addChoosableFileFilter(filterXML);
-        return  fileChooser;
+        return fileChooser;
     }
 
     public String getFileName(JFileChooser fileChooser) {
@@ -114,7 +123,7 @@ public class GameWindow {
         String selectedFileName = selectedFile.getAbsolutePath();
 
         System.out.println("Player has chosen to save game at: " + selectedFileName);
-        FileNameExtensionFilter fileFilter = (FileNameExtensionFilter)fileChooser.getFileFilter();
+        FileNameExtensionFilter fileFilter = (FileNameExtensionFilter) fileChooser.getFileFilter();
         System.out.println("Accepted extensions: " + Arrays.toString(fileFilter.getExtensions()));
         if (!fileFilter.accept(selectedFile))
             selectedFileName = selectedFileName + "." + fileFilter.getExtensions()[0];

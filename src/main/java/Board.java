@@ -15,7 +15,6 @@ public class Board extends JPanel implements MouseListener {
     private boolean enableGame;
     private Point clickedCellPosition = new Point(-1, -1);
     private final Point nullPosition = new Point(-1, -1);
-    private boolean boardFlipped;
     private ConnectionHandler connectionHandler;
 
     //starting board state
@@ -33,38 +32,40 @@ public class Board extends JPanel implements MouseListener {
             {new Rook(Cell.Colour.black), new Knight(Cell.Colour.black), new Bishop(Cell.Colour.black), new Queen(Cell.Colour.black),
                     new King(Cell.Colour.black), new Bishop(Cell.Colour.black), new Knight(Cell.Colour.black), new Rook(Cell.Colour.black)}
     };
-    public Board(Cell.Colour playerColour){
-        this(false, playerColour);
+
+    public Board() {
+        this(Cell.Colour.white);
     }
-    public Board(){
-        this(false, Cell.Colour.white);
+
+    public Board(Cell.Colour playerColour) {
+        this(playerColour, null);
     }
-    public Board(boolean boardFlipped, Cell.Colour playerColour){
-        this.boardFlipped = boardFlipped;
+
+    public Board(Cell.Colour playerColour, ConnectionHandler connectionHandler) {
         setBoardAltered(false);
         this.playerColour = playerColour;
+        this.connectionHandler = connectionHandler;
+
         cells = new Cell[size][size];
         setLayout(new GridLayout(size, size, 0, 0));
 
         this.addMouseListener(this);
         Cell.Colour color = Cell.Colour.black;
-        if(boardFlipped) {
-            for(int y = 0; y < size; ++y) {
-                for(int x = size - 1; x >= 0; --x) {
+        if (playerColour == Cell.Colour.black) {
+            for (int y = 0; y < size; ++y) {
+                for (int x = size - 1; x >= 0; --x) {
                     Cell cell = new Cell(color, this, new Point(x, y));
                     cells[y][x] = cell;
                     cell.board = this;
                     add(cell);
 
-                    if(pieces[y][x] != null)
-                        cell.setPiece(pieces[y][x]);
+                    cell.setPiece(pieces[y][x]);
 
-                    if(x != 0)
+                    if (x != 0)
                         color = color == Cell.Colour.black ? Cell.Colour.white : Cell.Colour.black;
                 }
             }
-        }
-        else {
+        } else {
             for (int y = size - 1; y >= 0; --y) {
                 for (int x = 0; x < size; ++x) {
                     Cell cell = new Cell(color, this, new Point(x, y));
@@ -85,21 +86,19 @@ public class Board extends JPanel implements MouseListener {
         setPreferredSize(windowSize);
         setSize(windowSize);
 
-        whiteTurn = true;
-        enableGame = true;
-        if(playerColour == Cell.Colour.black){
-            Message message = connectionHandler.receive();
-            cells[message.move.after.y][message.move.after.x].setPiece(cells[message.move.before.y][message.move.before.x].getPiece());
-            cells[message.move.before.y][message.move.before.x].setPiece(null);
-            if(message.state == CheckDetector.State.check)
-                System.out.println("CHECKED");
-            else if(message.state == CheckDetector.State.checkmate)
-                System.out.println("YOU LOST");
-            whiteTurn = false;
+        if (connectionHandler != null) {
+            connectionHandler.setBoard(this);
+            if (connectionHandler.isAlive())
+                connectionHandler.resumeReceiving();
+            else
+                connectionHandler.start();
         }
+
+        whiteTurn = true;
+        enableGame = connectionHandler == null || playerColour != Cell.Colour.black;
     }
 
-    public Board(Board board){
+    public Board(Board board) {
         this.cells = new Cell[size][size];
         this.playerColour = board.playerColour;
         this.whiteTurn = board.whiteTurn;
@@ -107,11 +106,11 @@ public class Board extends JPanel implements MouseListener {
         this.clickedCellPosition = board.clickedCellPosition;
         setBoardAltered(false);
 
-        for(int y = 0; y < size; ++y){
-            for(int x = 0; x < size; ++x) {
+        for (int y = 0; y < size; ++y) {
+            for (int x = 0; x < size; ++x) {
                 this.cells[y][x] = new Cell(board.getCells()[y][x].getColour(), this, new Point(x, y));
                 Piece piece = board.getCells()[y][x].getPiece();
-                if(piece != null)
+                if (piece != null)
                     this.cells[y][x].setPiece(piece.copy());
             }
         }
@@ -125,7 +124,7 @@ public class Board extends JPanel implements MouseListener {
         return cells;
     }
 
-    public void switchTurn(){
+    public void switchTurn() {
         this.whiteTurn = !this.whiteTurn;
         String currentTurn = whiteTurn ? "White" : "Black";
         System.out.println(currentTurn + " turn");
@@ -142,22 +141,23 @@ public class Board extends JPanel implements MouseListener {
     public boolean checkIfBoardAltered() {
         return isBoardAltered;
     }
+
     public void setBoardAltered(boolean isAltered) {
         isBoardAltered = isAltered;
     }
 
-    public void setPieces(Piece[][] pieces){
-        for(int y = 0; y < size; ++y){
-            for(int x = 0; x < size; ++x)
+    public void setPieces(Piece[][] pieces) {
+        for (int y = 0; y < size; ++y) {
+            for (int x = 0; x < size; ++x)
                 cells[y][x].setPiece(pieces[y][x]);
         }
     }
 
-    public void clearMoves(){
-        for(int y = 0; y < size; ++y){
-            for(int x = 0; x < size; ++x){
+    public void clearMoves() {
+        for (int y = 0; y < size; ++y) {
+            for (int x = 0; x < size; ++x) {
                 Piece piece = cells[y][x].getPiece();
-                if(piece != null)
+                if (piece != null)
                     piece.clearMoves();
             }
         }
@@ -165,28 +165,28 @@ public class Board extends JPanel implements MouseListener {
 
     @Override
     protected void paintComponent(Graphics g) {
-        for(int y = 0; y < size; ++y){
-            for(int x = 0; x < size; ++x) {
+        for (int y = 0; y < size; ++y) {
+            for (int x = 0; x < size; ++x) {
                 cells[y][x].paint(g);
             }
         }
     }
 
-    public void setConnectionHandler(ConnectionHandler connectionHandler){
+    public void setConnectionHandler(ConnectionHandler connectionHandler) {
         this.connectionHandler = connectionHandler;
     }
 
-    public boolean moveIfPossible(Cell start, Cell destination){ // moves piece if not contradicted by rules
+    public boolean moveIfPossible(Cell start, Cell destination) { // moves piece if not contradicted by rules
         System.out.println("moveIfPossible function called for element " + start.getPieceNameColor()
                 + " from cell X:" + start.getPosition().x + ", Y:" + start.getPosition().y
                 + " to cell X:" + destination.getPosition().x + ", Y:" + destination.getPosition().y);
-        if(!start.getOccupation()) {
+        if (!start.getOccupation()) {
             System.out.println("start cell not occupied, position: " + start.getPosition().toString());
             return false;
         }
 
         boolean movable = start.getPiece().isAppropriateMove(destination);
-        if(movable) {
+        if (movable) {
             Piece movedPiece = start.getPiece();
             start.removePiece();
             destination.setPiece(movedPiece);
@@ -198,8 +198,8 @@ public class Board extends JPanel implements MouseListener {
 
     //@Override
     // this function is invoked when the mouse button has been clicked (pressed and released) on a component
-    public void mouseClicked(MouseEvent e){
-        if(!enableGame) // disables moves if there was a checkmate
+    public void mouseClicked(MouseEvent e) {
+        if (!enableGame) // disables moves if there was a checkmate
             return;
         Cell clicked = (Cell) getComponentAt(new Point(e.getX(), e.getY()));
         Point clickedPosition = clicked.getPosition();
@@ -209,11 +209,11 @@ public class Board extends JPanel implements MouseListener {
         int posY = clickedPosition.y;
         System.out.println("posX = " + posX + ", posY = " + posY);
 
-        if(clickedCellPosition.equals(nullPosition)){ //player hasn't chosen cell to move yet
-            if(clicked.getOccupation()) {
+        if (clickedCellPosition.equals(nullPosition)) { //player hasn't chosen cell to move yet
+            if (clicked.getOccupation()) {
                 System.out.println("Mouse clicked to choose component");
-                if(clicked.getPiece().getColourAsString().equals("White") && whiteTurn
-                    || clicked.getPiece().getColourAsString().equals("Black") && !whiteTurn){
+                if (clicked.getPiece().getColourAsString().equals("White") && whiteTurn
+                        || clicked.getPiece().getColourAsString().equals("Black") && !whiteTurn) {
                     this.clickedCellPosition = clickedPosition;
                 }
             }
@@ -221,30 +221,38 @@ public class Board extends JPanel implements MouseListener {
             int prevX = clickedCellPosition.x;
             int prevY = clickedCellPosition.y;
 
-            if(!clicked.getOccupation()) {
+            if (!clicked.getOccupation()) {
                 System.out.println("Mouse clicked to move component to vacant cell");
 
                 isMoved = moveIfPossible(cells[prevY][prevX], clicked); //movePiece from clickedCell to clicked
                 this.clickedCellPosition = nullPosition;
             }
-            if(clicked.getOccupation()){
-                if(clicked.getPiece().getColourAsString().equals("White") && !whiteTurn
-                        || clicked.getPiece().getColourAsString().equals("Black") && whiteTurn){
+            if (clicked.getOccupation()) {
+                if (clicked.getPiece().getColourAsString().equals("White") && !whiteTurn
+                        || clicked.getPiece().getColourAsString().equals("Black") && whiteTurn) {
                     System.out.println("Mouse clicked to beat component");
                     isMoved2 = moveIfPossible(cells[prevY][prevX], clicked); //beat clicked with clickedCell
                     this.clickedCellPosition = nullPosition;
                 }
-                if(clicked.getPiece().getColourAsString().equals("White") && whiteTurn
-                        || clicked.getPiece().getColourAsString().equals("Black") && !whiteTurn){
+                if (clicked.getPiece().getColourAsString().equals("White") && whiteTurn
+                        || clicked.getPiece().getColourAsString().equals("Black") && !whiteTurn) {
                     System.out.println("Mouse clicked to change component to move");
                     this.clickedCellPosition = clickedPosition;
                 }
             }
-            if(isMoved || isMoved2) {
+            if (isMoved || isMoved2) {
+                repaint();
                 System.out.println("One of the components was moved");
                 clearMoves();
                 Cell.Colour playerColour = whiteTurn ? Cell.Colour.white : Cell.Colour.black;
-                if(CheckDetector.isOpponentChecked(this, playerColour) == CheckDetector.State.checkmate) {
+                Move move = new Move(cells[prevY][prevX].getPosition(), clicked.getPosition());
+                CheckDetector.State state = CheckDetector.isOpponentChecked(this, playerColour);
+                Message message = new Message(move, state);
+                if (connectionHandler != null) {
+                    connectionHandler.send(message);
+                    disableGame();
+                }
+                if (state == CheckDetector.State.checkmate) {
                     disableGame();
                     System.out.println("GAME OVER");
                     final JFrame warningWindow = new JFrame();
@@ -253,39 +261,39 @@ public class Board extends JPanel implements MouseListener {
                             "End of game",
                             JOptionPane.INFORMATION_MESSAGE);
                 }
-                Move move = new Move(cells[prevY][prevX].getPosition(), clicked.getPosition());
-                CheckDetector.State state = CheckDetector.isOpponentChecked(this, playerColour);
-                if(state == CheckDetector.State.checkmate)
-                    System.out.println("YOU WON");
-                Message message = new Message(move, state);
-                if(connectionHandler != null) {
-                    connectionHandler.send(message);
-                    message = connectionHandler.receive();
-                    cells[message.move.after.y][message.move.after.x].setPiece(cells[message.move.before.y][message.move.before.x].getPiece());
-                    cells[message.move.before.y][message.move.before.x].setPiece(null);
-                    if(message.state == CheckDetector.State.check)
-                        System.out.println("CHECKED");
-                    else if(message.state == CheckDetector.State.checkmate)
-                        System.out.println("YOU LOST");
-                }
-                switchTurn();
-                if(!isBoardAltered) { // board was not altered yet
-                    setBoardAltered(true); // sets board status as altered
-                }
+                setBoardAltered(true); // sets board status as altered
             }
         }
         repaint();
     }
 
     // this function is invoked when the mouse enters a component
-    public void mouseEntered(MouseEvent e) {}
+    public void mouseEntered(MouseEvent e) {
+    }
 
     // this function is invoked when the mouse exits the component
-    public void mouseExited(MouseEvent e) {}
+    public void mouseExited(MouseEvent e) {
+    }
 
     // this function is invoked when the mouse button has been pressed on a component
-    public void mousePressed(MouseEvent e) {}
+    public void mousePressed(MouseEvent e) {
+    }
 
     // this function is invoked when the mouse button has been released on a component
-    public void mouseReleased(MouseEvent e) {}
+    public void mouseReleased(MouseEvent e) {
+    }
+
+    public void onMessageReceived(Message message) {
+        cells[message.move.after.y][message.move.after.x].setPiece(cells[message.move.before.y][message.move.before.x].getPiece());
+        cells[message.move.before.y][message.move.before.x].setPiece(null);
+        enableGame = true;
+        whiteTurn = playerColour == Cell.Colour.white;
+        if (message.state == CheckDetector.State.check)
+            System.out.println("CHECKED");
+        else if (message.state == CheckDetector.State.checkmate) {
+            System.out.println("YOU LOST");
+            enableGame = false;
+        }
+        repaint();
+    }
 }
