@@ -6,7 +6,7 @@ public class King extends Piece {
         super(colour);
     }
 
-    public Piece copy(){
+    public Piece copy() {
         return new King(colour);
     }
 

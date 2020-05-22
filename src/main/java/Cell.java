@@ -19,11 +19,11 @@ public class Cell extends JComponent {
 
     public void setPiece(Piece piece) {
         this.piece = piece;
-        if(piece != null)
+        if (piece != null)
             piece.setCell(this);
     }
 
-    public void removePiece(){
+    public void removePiece() {
         piece = null;
     }
 
@@ -31,7 +31,7 @@ public class Cell extends JComponent {
         return piece;
     }
 
-    public Colour getColour(){
+    public Colour getColour() {
         return colour;
     }
 

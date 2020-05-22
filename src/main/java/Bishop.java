@@ -1,11 +1,11 @@
 import java.util.ArrayList;
 
-public class Bishop extends Piece{
+public class Bishop extends Piece {
     public Bishop(Cell.Colour colour) {
         super(colour);
     }
 
-    public Piece copy(){
+    public Piece copy() {
         return new Bishop(colour);
     }
 

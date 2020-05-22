@@ -1,6 +1,7 @@
 plugins {
     id 'java'
     id 'application'
+    id 'java-library'
 }
 
 group 'org.example'
@@ -15,6 +16,14 @@ dependencies {
 }
 
 mainClassName = 'Game'
+
+jar{
+    manifest{
+        attributes("Implementation-Title" : "chess",
+        "Implementation-Version": "1.0",
+        "Main-Class": mainClassName)
+    }
+}
 
 test {
     include 'src/test/java/*'

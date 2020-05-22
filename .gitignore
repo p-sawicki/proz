@@ -1,12 +1,5 @@
-<<<<<<< HEAD
 .gradle/
 .idea/
 build/
 gradle/
 **/.DS_Store
-=======
-.gradle/.
-.idea/.
-build/.
-gradle/.
->>>>>>> Added wait for white move if player starts as black.
