@@ -5,6 +5,7 @@ import javax.swing.filechooser.FileSystemView;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.imageio.ImageIO;
 import java.io.IOException;
+import java.util.Random;
 
 
 public class Menu implements Runnable {
@@ -13,6 +14,8 @@ public class Menu implements Runnable {
     private final Dimension windowSize = new Dimension(windowWidth, windowHeight);
     private MenuConnectionHandler menuConnectionHandler;
     private JFrame menuWindow;
+    private JLabel spacerLabel;
+    private JFrame gameParametersWindow;
 
     public void run() {
         // window parameters
@@ -90,7 +93,7 @@ public class Menu implements Runnable {
 
     private void setGameParametersAndStartGame() { // asks for player name, opponent IP
         // window parameters
-        final JFrame gameParametersWindow = new JFrame("Game Parameters");
+        gameParametersWindow = new JFrame("Game Parameters");
         gameParametersWindow.setSize(new Dimension(400, 100));
         gameParametersWindow.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         gameParametersWindow.setVisible(true);
@@ -101,7 +104,7 @@ public class Menu implements Runnable {
         JTextField nameField = new JTextField();
         JLabel enterIPLabel = new JLabel("  Please enter opponent IP:");
         JTextField ipField = new JTextField();
-        JLabel spacerLabel = new JLabel("");
+        spacerLabel = new JLabel("");
         JButton startButton = new JButton("Start");
 
         gameParametersWindow.add(enterNameLabel);
@@ -119,15 +122,8 @@ public class Menu implements Runnable {
                 return;
             }
             String opponentIP = ipField.getText();
+            spacerLabel.setText("Waiting...");
             menuConnectionHandler.challenge(playerName, opponentIP);
-
-            new GameWindow(playerName, Cell.Colour.white, new ConnectionHandler(opponentIP, null), menuConnectionHandler);
-            // setConnectionHandler with opponentIP;
-             /*if(opponentISNotReady) {
-                System.out.println("opponent not ready");
-                return;
-            }*/
-            gameParametersWindow.dispose();
         });
     }
 
@@ -201,9 +197,39 @@ public class Menu implements Runnable {
     }
 
     public void onOpponentChallenge(String name, String address) {
-        System.out.println("opponent " + name + " connected from " + address);
+        final JFrame challengeWindow = new JFrame("Challenge Window");
+        challengeWindow.setSize(new Dimension(720, 100));
+        challengeWindow.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        challengeWindow.setVisible(true);
+        challengeWindow.setLayout(new GridLayout(2, 2));
 
-        new GameWindow("test", Cell.Colour.black, new ConnectionHandler(address, null), menuConnectionHandler);
-        menuWindow.dispose();
+        challengeWindow.add(new JLabel("You've been challenged to a game!"));
+        challengeWindow.add(new JLabel("Opponent name: " + name + " IP: " + address));
+        JButton acceptButton = new JButton("Accept");
+        JButton declineButton = new JButton("Decline");
+        challengeWindow.add(acceptButton);
+        challengeWindow.add(declineButton);
+
+        acceptButton.addActionListener(e -> {
+            Cell.Colour colour = (new Random()).nextInt(2) == 0 ? Cell.Colour.black : Cell.Colour.white;
+            menuConnectionHandler.accept(address, colour == Cell.Colour.black ? Cell.Colour.white : Cell.Colour.black);
+            new GameWindow("test", colour, new ConnectionHandler(address, null), menuConnectionHandler);
+            challengeWindow.dispose();
+            menuWindow.dispose();
+        });
+
+        declineButton.addActionListener(e -> {
+            menuConnectionHandler.decline(address);
+            challengeWindow.dispose();
+        });
+    }
+
+    public void onChallengeAccepted(Cell.Colour colour, String address){
+        new GameWindow("test", colour, new ConnectionHandler(address, null), menuConnectionHandler);
+        gameParametersWindow.dispose();
+    }
+
+    public void onChallengeDeclined(){
+        spacerLabel.setText("Declined!");
     }
 }

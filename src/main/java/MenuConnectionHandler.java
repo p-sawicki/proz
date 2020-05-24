@@ -3,7 +3,6 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.net.SocketException;
 import java.net.SocketTimeoutException;
 
 public class MenuConnectionHandler extends Thread {
@@ -31,9 +30,19 @@ public class MenuConnectionHandler extends Thread {
                 Socket incomingConnection = serverSocket.accept();
                 DataInputStream dataInputStream = new DataInputStream(incomingConnection.getInputStream());
                 String[] message = dataInputStream.readUTF().split(" ");
+                String address = incomingConnection.getInetAddress().getHostAddress();
                 incomingConnection.close();
-                if (message[0].equals("C"))
-                    menu.onOpponentChallenge(message[1], incomingConnection.getInetAddress().getHostAddress());
+                switch (message[0]) {
+                    case "C":
+                        menu.onOpponentChallenge(message[1], address);
+                        break;
+                    case "A":
+                        menu.onChallengeAccepted(message[1].equals("B") ? Cell.Colour.black : Cell.Colour.white, address);
+                        break;
+                    case "D":
+                        menu.onChallengeDeclined();
+                        break;
+                }
             } catch (SocketTimeoutException ignored) {
             } catch (Exception e) {
                 break;
@@ -41,15 +50,27 @@ public class MenuConnectionHandler extends Thread {
         }
     }
 
-    public void challenge(String name, String address) {
+    private void sendMessage(String address, String message) {
         try {
             Socket socket = new Socket(address, port);
             DataOutputStream dataOutputStream = new DataOutputStream(socket.getOutputStream());
-            dataOutputStream.writeUTF("C " + name);
+            dataOutputStream.writeUTF(message);
             socket.close();
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    public void challenge(String name, String address) {
+        sendMessage(address, "C " + name);
+    }
+
+    public void accept(String address, Cell.Colour colour) {
+        sendMessage(address, "A " + (colour == Cell.Colour.black ? "B" : "W"));
+    }
+
+    public void decline(String address) {
+        sendMessage(address, "D");
     }
 
     public void stopReceiving() {
