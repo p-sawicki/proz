@@ -142,6 +142,8 @@ public class Board extends JPanel implements MouseListener {
         return size;
     }
 
+    public boolean checkIfSinglePlayer() { return singlePlayer; }
+
     public boolean checkIfBoardAltered() {
         return isBoardAltered;
     }
