@@ -13,13 +13,14 @@ public class GameWindow {
     private JFrame window;
     private Board board;
     private String playerName;
+    private String opponentName;
     private final ConnectionHandler connectionHandler;
 
     public GameWindow(String playerName) {
-        this(playerName, Cell.Colour.white, null, null);
+        this(playerName, Cell.Colour.white, null, null, "");
     }
 
-    public GameWindow(String playerName, Cell.Colour playerColour, ConnectionHandler connectionHandler, MenuConnectionHandler menuConnectionHandler) {
+    public GameWindow(String playerName, Cell.Colour playerColour, ConnectionHandler connectionHandler, MenuConnectionHandler menuConnectionHandler, String opponentName) {
         window = new JFrame("Chess");
         window.setLayout(new BorderLayout(10, 10));
 
@@ -30,6 +31,7 @@ public class GameWindow {
 
         board = new Board(playerColour, connectionHandler);
         setPlayerName(playerName);
+        setOpponentName(opponentName);
 
         window.add(board, BorderLayout.CENTER);
 
@@ -55,6 +57,12 @@ public class GameWindow {
         saveGameButton.setAccelerator(KeyStroke.getKeyStroke("ctrl S"));
         final JMenuItem quitGameButton = new JMenuItem("Quit game");
         quitGameButton.setAccelerator(KeyStroke.getKeyStroke("ctrl Q"));
+        final JLabel playerNameLabel;
+        if (board.checkIfSinglePlayer()) {
+            playerNameLabel = new JLabel("  |  " + playerName + "  ");
+        } else {
+            playerNameLabel = new JLabel("  |  " + playerName + " vs " + opponentName + "  ");
+        }
 
         // buttons' listeners
         goBackToMenuButton.addActionListener(e -> {
@@ -81,6 +89,7 @@ public class GameWindow {
         menuBar.add(goBackToMenuButton);
         menuBar.add(saveGameButton);
         menuBar.add(quitGameButton);
+        menuBar.add(playerNameLabel);
         window.setJMenuBar(menuBar);
     }
 
@@ -154,6 +163,14 @@ public class GameWindow {
 
     public void setPlayerName(String playerName) {
         this.playerName = playerName;
+    }
+
+    public String getOpponentName() {
+        return opponentName;
+    }
+
+    public void setOpponentName(String opponentName) {
+        this.opponentName = opponentName;
     }
 
     public boolean checkIfBoardWasAltered() {

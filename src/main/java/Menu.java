@@ -16,6 +16,7 @@ public class Menu implements Runnable {
     private JFrame menuWindow;
     private JLabel spacerLabel;
     private JFrame gameParametersWindow;
+    private String playerName;
 
     public void run() {
         // window parameters
@@ -32,6 +33,8 @@ public class Menu implements Runnable {
 
         setBackgroundImage(menuWindow);
         addButtons(menuWindow);
+
+        playerName = "player";
     }
 
     private void setBackgroundImage(JFrame window) {
@@ -164,7 +167,7 @@ public class Menu implements Runnable {
         });
     }
 
-    private void setGameParametersAndStartGame(String playerName, String opponentIP, Board board) {
+    private void setGameParametersAndStartGame(boolean singlePlayer, String playerName, String opponentIP, Board board) {
         // window parameters
         final JFrame gameParametersWindow = new JFrame("Game Parameters");
         gameParametersWindow.setSize(new Dimension(400, 100));
@@ -182,8 +185,12 @@ public class Menu implements Runnable {
 
         gameParametersWindow.add(enterNameLabel);
         gameParametersWindow.add(nameField);
-        gameParametersWindow.add(enterIPLabel);
-        gameParametersWindow.add(ipField);
+
+        if (!singlePlayer) {
+            gameParametersWindow.add(enterIPLabel);
+            gameParametersWindow.add(ipField);
+        }
+
         gameParametersWindow.add(spacerLabel);
         gameParametersWindow.add(startButton);
 
@@ -227,13 +234,14 @@ public class Menu implements Runnable {
         final JFrame descriptionWindow = new JFrame("About program");
 
         ImageIcon icon = new ImageIcon(Utility.getResourcePath() + "gameLogo.png");
+        System.out.println("Trying to get game loga at: " + Utility.getResourcePath() + "gameLogo.png");
         JOptionPane.showMessageDialog(descriptionWindow,
                 "\n" + "Program title: \"Chess\"" + "\n\n" + "Version: 1.0" + "\n\n" + "Authors: Piotr Sawicki, Vladyslav Kyryk" + "\n",
                 "About program",
                 JOptionPane.INFORMATION_MESSAGE, icon);
     }
 
-    public void onOpponentChallenge(String name, String address) {
+    public void onOpponentChallenge(String opponentName, String address) {
         final JFrame challengeWindow = new JFrame("Challenge Window");
         challengeWindow.setSize(new Dimension(720, 100));
         challengeWindow.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
@@ -241,7 +249,7 @@ public class Menu implements Runnable {
         challengeWindow.setLayout(new GridLayout(2, 2));
 
         challengeWindow.add(new JLabel("You've been challenged to a game!"));
-        challengeWindow.add(new JLabel("Opponent name: " + name + " IP: " + address));
+        challengeWindow.add(new JLabel("Opponent name: " + opponentName + " IP: " + address));
         JButton acceptButton = new JButton("Accept");
         JButton declineButton = new JButton("Decline");
         challengeWindow.add(acceptButton);
@@ -249,8 +257,10 @@ public class Menu implements Runnable {
 
         acceptButton.addActionListener(e -> {
             Cell.Colour colour = (new Random()).nextInt(2) == 0 ? Cell.Colour.black : Cell.Colour.white;
-            menuConnectionHandler.accept(address, colour == Cell.Colour.black ? Cell.Colour.white : Cell.Colour.black);
-            new GameWindow("test", colour, new ConnectionHandler(address, null), menuConnectionHandler);
+            enterPlayerName();
+            String playerName = this.playerName;
+            menuConnectionHandler.accept(address, colour == Cell.Colour.black ? Cell.Colour.white : Cell.Colour.black, playerName);
+            new GameWindow(playerName, colour, new ConnectionHandler(address, null), menuConnectionHandler, opponentName);
             challengeWindow.dispose();
             menuWindow.dispose();
         });
@@ -261,12 +271,42 @@ public class Menu implements Runnable {
         });
     }
 
-    public void onChallengeAccepted(Cell.Colour colour, String address){
-        new GameWindow("test", colour, new ConnectionHandler(address, null), menuConnectionHandler);
+    public void onChallengeAccepted(Cell.Colour colour, String address, String opponentName){
+        new GameWindow(this.playerName, colour, new ConnectionHandler(address, null), menuConnectionHandler, opponentName);
         gameParametersWindow.dispose();
     }
 
     public void onChallengeDeclined(){
         spacerLabel.setText("Declined!");
+    }
+
+    public void enterPlayerName() {
+        gameParametersWindow = new JFrame("Game Parameters");
+        gameParametersWindow.setSize(new Dimension(400, 100));
+        gameParametersWindow.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        gameParametersWindow.setVisible(true);
+        gameParametersWindow.setLayout(new GridLayout(2, 2));
+
+        // window objects
+        JLabel enterNameLabel = new JLabel("  Please enter your name:");
+        JTextField nameField = new JTextField();
+        spacerLabel = new JLabel("");
+        JButton startButton = new JButton("Start");
+
+        gameParametersWindow.add(enterNameLabel);
+        gameParametersWindow.add(nameField);
+        gameParametersWindow.add(spacerLabel);
+        gameParametersWindow.add(startButton);
+
+        // button listener
+        startButton.addActionListener(e -> {
+            String name = nameField.getText();
+            if (name.equals("")) {
+                System.out.println("player hasn't entered his name");
+                return;
+            }
+            playerName = name;
+            gameParametersWindow.dispose();
+        });
     }
 }

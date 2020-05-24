@@ -37,7 +37,7 @@ public class MenuConnectionHandler extends Thread {
                         menu.onOpponentChallenge(message[1], address);
                         break;
                     case "A":
-                        menu.onChallengeAccepted(message[1].equals("B") ? Cell.Colour.black : Cell.Colour.white, address);
+                        menu.onChallengeAccepted(message[1].equals("B") ? Cell.Colour.black : Cell.Colour.white, address, message[2]);
                         break;
                     case "D":
                         menu.onChallengeDeclined();
@@ -65,8 +65,8 @@ public class MenuConnectionHandler extends Thread {
         sendMessage(address, "C " + name);
     }
 
-    public void accept(String address, Cell.Colour colour) {
-        sendMessage(address, "A " + (colour == Cell.Colour.black ? "B" : "W"));
+    public void accept(String address, Cell.Colour colour, String myName) {
+        sendMessage(address, "A " + (colour == Cell.Colour.black ? "B" : "W") + " " + myName);
     }
 
     public void decline(String address) {
