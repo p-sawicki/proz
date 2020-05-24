@@ -54,7 +54,7 @@ public class Menu implements Runnable {
 
         // buttons' listeners
         newGameButton.addActionListener(e -> {
-            setGameParametersAndStartGame();
+            setGameType();
             window.dispose();
         });
         openGameButton.addActionListener(e -> { // new window must show up with saved games to choose from
@@ -91,7 +91,33 @@ public class Menu implements Runnable {
         return newButton;
     }
 
-    private void setGameParametersAndStartGame() { // asks for player name, opponent IP
+    private void setGameType() {
+        // window parameters
+        gameParametersWindow = new JFrame("Game Type");
+        gameParametersWindow.setSize(new Dimension(400, 100));
+        gameParametersWindow.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        gameParametersWindow.setVisible(true);
+        gameParametersWindow.setLayout(new GridLayout(3, 1));
+
+        // window objects
+        JLabel enterNameLabel = new JLabel("  Please select game type:");
+        JButton singlePlayerButton = new JButton("Single player");
+        JButton multiPlayerButton = new JButton("Multiplayer");
+
+        gameParametersWindow.add(enterNameLabel);
+        gameParametersWindow.add(singlePlayerButton);
+        gameParametersWindow.add(multiPlayerButton);
+
+        // buttons' listeners
+        singlePlayerButton.addActionListener(e -> {
+            setGameParametersAndStartGame(true);
+        });
+        multiPlayerButton.addActionListener(e -> {
+            setGameParametersAndStartGame(false);
+        });
+    }
+
+    private void setGameParametersAndStartGame(boolean singlePlayer) { // asks for player name, opponent IP
         // window parameters
         gameParametersWindow = new JFrame("Game Parameters");
         gameParametersWindow.setSize(new Dimension(400, 100));
@@ -109,8 +135,12 @@ public class Menu implements Runnable {
 
         gameParametersWindow.add(enterNameLabel);
         gameParametersWindow.add(nameField);
-        gameParametersWindow.add(enterIPLabel);
-        gameParametersWindow.add(ipField);
+
+        if (!singlePlayer) {
+            gameParametersWindow.add(enterIPLabel);
+            gameParametersWindow.add(ipField);
+        }
+
         gameParametersWindow.add(spacerLabel);
         gameParametersWindow.add(startButton);
 
@@ -121,9 +151,16 @@ public class Menu implements Runnable {
                 System.out.println("player hasn't entered his name");
                 return;
             }
-            String opponentIP = ipField.getText();
-            spacerLabel.setText("Waiting...");
-            menuConnectionHandler.challenge(playerName, opponentIP);
+            String opponentIP = null;
+            if (!singlePlayer) {
+                opponentIP = ipField.getText();
+            }
+            if (opponentIP == null) {
+                new GameWindow(playerName);
+            } else {
+                spacerLabel.setText("Waiting...");
+                menuConnectionHandler.challenge(playerName, opponentIP);
+            }
         });
     }
 

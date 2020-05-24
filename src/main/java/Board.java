@@ -16,6 +16,7 @@ public class Board extends JPanel implements MouseListener {
     private Point clickedCellPosition = new Point(-1, -1);
     private final Point nullPosition = new Point(-1, -1);
     private ConnectionHandler connectionHandler;
+    private boolean singlePlayer;
 
     //starting board state
     private final Piece[][] pieces = {
@@ -87,11 +88,14 @@ public class Board extends JPanel implements MouseListener {
         setSize(windowSize);
 
         if (connectionHandler != null) {
+            singlePlayer = false;
             connectionHandler.setBoard(this);
             if (connectionHandler.isAlive())
                 connectionHandler.resumeReceiving();
             else
                 connectionHandler.start();
+        } else {
+            singlePlayer = true;
         }
 
         whiteTurn = true;
@@ -254,12 +258,23 @@ public class Board extends JPanel implements MouseListener {
                 }
                 if (state == CheckDetector.State.checkmate) {
                     System.out.println("GAME OVER");
+                    disableGame();
                     final JFrame warningWindow = new JFrame();
-                    JOptionPane.showMessageDialog(warningWindow,
-                            "You won!",
-                            "End of game",
-                            JOptionPane.INFORMATION_MESSAGE);
+                    if (!singlePlayer) {
+                        JOptionPane.showMessageDialog(warningWindow,
+                                "You won!",
+                                "End of game",
+                                JOptionPane.INFORMATION_MESSAGE);
+                    } else {
+                        String winnerColor = whiteTurn ? "White" : "Black";
+                        JOptionPane.showMessageDialog(warningWindow,
+                                winnerColor + " won!",
+                                "End of game",
+                                JOptionPane.INFORMATION_MESSAGE);
+                    }
+
                 }
+                switchTurn();
                 setBoardAltered(true); // sets board status as altered
             }
         }
