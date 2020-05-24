@@ -253,11 +253,10 @@ public class Board extends JPanel implements MouseListener {
                     disableGame();
                 }
                 if (state == CheckDetector.State.checkmate) {
-                    disableGame();
                     System.out.println("GAME OVER");
                     final JFrame warningWindow = new JFrame();
                     JOptionPane.showMessageDialog(warningWindow,
-                            "GAME OVER",
+                            "You won!",
                             "End of game",
                             JOptionPane.INFORMATION_MESSAGE);
                 }
@@ -286,14 +285,17 @@ public class Board extends JPanel implements MouseListener {
     public void onMessageReceived(Message message) {
         cells[message.move.after.y][message.move.after.x].setPiece(cells[message.move.before.y][message.move.before.x].getPiece());
         cells[message.move.before.y][message.move.before.x].setPiece(null);
+        repaint();
         enableGame = true;
         whiteTurn = playerColour == Cell.Colour.white;
         if (message.state == CheckDetector.State.check)
             System.out.println("CHECKED");
         else if (message.state == CheckDetector.State.checkmate) {
-            System.out.println("YOU LOST");
+            JOptionPane.showMessageDialog(new JFrame(),
+                    "You lost!",
+                    "End of game",
+                    JOptionPane.INFORMATION_MESSAGE);
             enableGame = false;
         }
-        repaint();
     }
 }

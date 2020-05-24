@@ -33,7 +33,6 @@ public class GameWindow {
 
         window.add(board, BorderLayout.CENTER);
 
-        window.pack();
         window.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
         window.addWindowListener(new WindowAdapter() {
             @Override
@@ -46,6 +45,7 @@ public class GameWindow {
         window.setVisible(true);
 
         initializeGameMenuBar(window);
+        window.pack();
     }
 
     private void initializeGameMenuBar(JFrame window) {
