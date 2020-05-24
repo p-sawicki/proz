@@ -125,7 +125,7 @@ public abstract class Piece {
     }
 
     private File getImageFile() {
-        return new File("src/main/resources/alpha/alpha/320/" + getColourAsString() + getName() + ".png");
+        return new File(Utility.getResourcePath() + getColourAsString() + getName() + ".png");
     }
 
     protected String getColourAsString() {

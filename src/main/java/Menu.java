@@ -37,7 +37,7 @@ public class Menu implements Runnable {
     private void setBackgroundImage(JFrame window) {
         try {
             window.setContentPane(
-                    new JLabel(new ImageIcon(ImageIO.read(new File("src/main/resources/alpha/alpha/320/menuBackground.png")))));
+                    new JLabel(new ImageIcon(ImageIO.read(new File(Utility.getResourcePath() + "menuBackground.png")))));
         } catch (IOException e) {
             System.out.println("Could not open image: " + e.getMessage());
         }
@@ -189,7 +189,7 @@ public class Menu implements Runnable {
     private void openGameDescription() {
         final JFrame descriptionWindow = new JFrame("About program");
 
-        ImageIcon icon = new ImageIcon("src/main/resources/alpha/alpha/320/gameLogo.png");
+        ImageIcon icon = new ImageIcon(Utility.getResourcePath() + "gameLogo.png");
         JOptionPane.showMessageDialog(descriptionWindow,
                 "\n" + "Program title: \"Chess\"" + "\n\n" + "Version: 1.0" + "\n\n" + "Authors: Piotr Sawicki, Vladyslav Kyryk" + "\n",
                 "About program",
