@@ -12,11 +12,16 @@ public class Menu implements Runnable {
     private final int windowHeight = 720;
     private final int windowWidth = 720;
     private final Dimension windowSize = new Dimension(windowWidth, windowHeight);
-    private MenuConnectionHandler menuConnectionHandler;
+    private final MenuConnectionHandler menuConnectionHandler;
     private JFrame menuWindow;
     private JLabel spacerLabel;
     private JFrame gameParametersWindow;
     private String playerName;
+
+    public Menu() {
+        menuConnectionHandler = new MenuConnectionHandler(this);
+        menuConnectionHandler.start();
+    }
 
     public void run() {
         // window parameters
@@ -24,12 +29,6 @@ public class Menu implements Runnable {
         menuWindow.setSize(windowSize);
         menuWindow.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         menuWindow.setVisible(true);
-
-        if (menuConnectionHandler == null) {
-            menuConnectionHandler = new MenuConnectionHandler(this);
-            menuConnectionHandler.start();
-        } else
-            menuConnectionHandler.resumeReceiving();
 
         setBackgroundImage(menuWindow);
         addButtons(menuWindow);
@@ -159,6 +158,7 @@ public class Menu implements Runnable {
                 opponentIP = ipField.getText();
             }
             if (opponentIP == null) {
+                menuConnectionHandler.stopReceiving();
                 new GameWindow(playerName);
             } else {
                 spacerLabel.setText("Waiting...");
@@ -271,12 +271,12 @@ public class Menu implements Runnable {
         });
     }
 
-    public void onChallengeAccepted(Cell.Colour colour, String address, String opponentName){
+    public void onChallengeAccepted(Cell.Colour colour, String address, String opponentName) {
         new GameWindow(this.playerName, colour, new ConnectionHandler(address, null), menuConnectionHandler, opponentName);
         gameParametersWindow.dispose();
     }
 
-    public void onChallengeDeclined(){
+    public void onChallengeDeclined() {
         spacerLabel.setText("Declined!");
     }
 
