@@ -1,10 +1,14 @@
+import com.thoughtworks.xstream.XStream;
+
+import javax.imageio.ImageIO;
 import javax.swing.*;
+import javax.swing.filechooser.FileNameExtensionFilter;
+import javax.swing.filechooser.FileSystemView;
 import java.awt.*;
 import java.io.File;
-import javax.swing.filechooser.FileSystemView;
-import javax.swing.filechooser.FileNameExtensionFilter;
-import javax.imageio.ImageIO;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.Random;
 
 
@@ -61,7 +65,7 @@ public class Menu implements Runnable {
         });
         openGameButton.addActionListener(e -> { // new window must show up with saved games to choose from
             if (openSavedGame()) { // saved game was successfully resumed
-                //window.dispose();
+                window.dispose();
             }
         });
         aboutGameButton.addActionListener(e -> {
@@ -120,8 +124,9 @@ public class Menu implements Runnable {
     }
 
     private void setGameParametersAndStartGame(boolean singlePlayer) { // asks for player name, opponent IP
-        // window parameters
         gameParametersWindow = new JFrame("Game Parameters");
+
+        // window parameters
         gameParametersWindow.setSize(new Dimension(400, 100));
         gameParametersWindow.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         gameParametersWindow.setVisible(true);
@@ -219,14 +224,19 @@ public class Menu implements Runnable {
 
         if (returnValue == JFileChooser.APPROVE_OPTION) {
             File selectedFile = jfc.getSelectedFile();
-            System.out.println("player has chosen saved game at: " + selectedFile.getAbsolutePath());
+            String fileName = selectedFile.getAbsolutePath();
+            System.out.println("player has chosen saved game at: " + fileName);
+
+            SavedGame savedGame = createSavedGameFromXml(fileName);
+
+            new GameWindow(savedGame.getPlayerName(), savedGame.createBoard());
+            //setGameParametersAndStartGame("savedName", "savedIP", savedBoard); // opens saved game to resume playing
         }
 
         if (returnValue == JFileChooser.CANCEL_OPTION) {
             return false; // player hasn't chosen saved game
         }
 
-        //setGameParametersAndStartGame("savedName", "savedIP", savedBoard); // opens saved game to resume playing
         return true;
     }
 
@@ -260,7 +270,7 @@ public class Menu implements Runnable {
             enterPlayerName();
             String playerName = this.playerName;
             menuConnectionHandler.accept(address, colour == Cell.Colour.black ? Cell.Colour.white : Cell.Colour.black, playerName);
-            new GameWindow(playerName, colour, new ConnectionHandler(address, null), menuConnectionHandler, opponentName);
+            new GameWindow(playerName, null, colour, new ConnectionHandler(address, null), menuConnectionHandler, opponentName);
             challengeWindow.dispose();
             menuWindow.dispose();
         });
@@ -272,7 +282,7 @@ public class Menu implements Runnable {
     }
 
     public void onChallengeAccepted(Cell.Colour colour, String address, String opponentName) {
-        new GameWindow(this.playerName, colour, new ConnectionHandler(address, null), menuConnectionHandler, opponentName);
+        new GameWindow(this.playerName, null, colour, new ConnectionHandler(address, null), menuConnectionHandler, opponentName);
         gameParametersWindow.dispose();
     }
 
@@ -308,5 +318,20 @@ public class Menu implements Runnable {
             playerName = name;
             gameParametersWindow.dispose();
         });
+    }
+
+    public SavedGame createSavedGameFromXml(String fileName) {
+        XStream xstream = new XStream();
+
+        String savedXmlGame = "";
+        try {
+            savedXmlGame = new String (Files.readAllBytes(Paths.get(fileName)));
+            //System.out.println( savedXmlGame );
+        }
+        catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return (SavedGame) xstream.fromXML(savedXmlGame);
     }
 }

@@ -17,10 +17,43 @@ public class Cell extends JComponent {
         setBorder(BorderFactory.createEmptyBorder());
     }
 
+    public Cell(Point position) {
+        this.colour = Cell.Colour.black;
+        this.position = position;
+    }
+
+    public Cell() {
+        this.colour = Cell.Colour.black;
+        this.position = new Point(-1, -1);
+    }
+
     public void setPiece(Piece piece) {
         this.piece = piece;
         if (piece != null)
             piece.setCell(this);
+    }
+
+    public void setPiece(String pieceType, Cell.Colour pieceColour) {
+        switch(pieceType) {
+            case "Pawn":
+                this.piece = new Pawn(pieceColour);
+                break;
+            case "Knight":
+                this.piece = new Knight(pieceColour);
+                break;
+            case "King":
+                this.piece = new King(pieceColour);
+                break;
+            case "Bishop":
+                this.piece = new Bishop(pieceColour);
+                break;
+            case "Queen":
+                this.piece = new Queen(pieceColour);
+                break;
+            case "Rook":
+                this.piece = new Rook(pieceColour);
+                break;
+        }
     }
 
     public void removePiece() {
