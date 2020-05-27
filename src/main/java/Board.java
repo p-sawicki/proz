@@ -120,12 +120,49 @@ public class Board extends JPanel implements MouseListener {
         }
     }
 
+    public Board(Cell[][] cells, boolean singlePlayer, Cell.Colour playerColour, boolean whiteTurn, boolean enableGame) {
+        this.cells = new Cell[size][size];
+        this.playerColour = playerColour;
+        this.whiteTurn = whiteTurn;
+        this.enableGame = enableGame;
+        this.singlePlayer = singlePlayer;
+        if (singlePlayer)
+            this.connectionHandler = null;
+        setBoardAltered(false);
+
+        this.addMouseListener(this);
+        setLayout(new GridLayout(size, size, 0, 0));
+        Cell.Colour color = Cell.Colour.black;
+        for (int y = size - 1; y >= 0; --y) {
+            for (int x = 0; x < size; ++x) {
+                Cell cell = new Cell(color, this, new Point(x, y));
+                this.cells[y][x] = cell;
+                add(cell);
+
+                Piece piece = cells[y][x].getPiece();
+                if (piece != null)
+                    this.cells[y][x].setPiece(piece.copy());
+
+                if (x != size - 1)
+                    color = color == Cell.Colour.black ? Cell.Colour.white : Cell.Colour.black;
+            }
+        }
+
+        setMinimumSize(windowSize);
+        setPreferredSize(windowSize);
+        setSize(windowSize);
+    }
+
     public Cell.Colour getPlayerColour() {
         return playerColour;
     }
 
     public Cell[][] getCells() {
         return cells;
+    }
+
+    public boolean getWhiteTurn() {
+        return whiteTurn;
     }
 
     public void switchTurn() {

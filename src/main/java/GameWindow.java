@@ -1,11 +1,16 @@
+import com.thoughtworks.xstream.XStream;
+
 import javax.swing.*;
-import java.awt.*;
-import javax.swing.filechooser.FileSystemView;
 import javax.swing.filechooser.FileNameExtensionFilter;
+import javax.swing.filechooser.FileSystemView;
+import java.awt.*;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.Arrays;
+
 //import java.time.LocalDateTime;
 
 
@@ -17,10 +22,12 @@ public class GameWindow {
     private final ConnectionHandler connectionHandler;
 
     public GameWindow(String playerName) {
-        this(playerName, Cell.Colour.white, null, null, "");
+        this(playerName, null, Cell.Colour.white, null, null, "");
     }
 
-    public GameWindow(String playerName, Cell.Colour playerColour, ConnectionHandler connectionHandler, MenuConnectionHandler menuConnectionHandler, String opponentName) {
+    public GameWindow(String playerName, Board board) { this(playerName, board, Cell.Colour.white, null, null, ""); }
+
+    public GameWindow(String playerName, Board board, Cell.Colour playerColour, ConnectionHandler connectionHandler, MenuConnectionHandler menuConnectionHandler, String opponentName) {
         window = new JFrame("Chess");
         window.setLayout(new BorderLayout(10, 10));
 
@@ -29,11 +36,15 @@ public class GameWindow {
         if (menuConnectionHandler != null)
             menuConnectionHandler.stopReceiving();
 
-        board = new Board(playerColour, connectionHandler);
+        if (board != null) {
+            this.board = board;
+        } else {
+            this.board = new Board(playerColour, connectionHandler);
+        }
         setPlayerName(playerName);
         setOpponentName(opponentName);
 
-        window.add(board, BorderLayout.CENTER);
+        window.add(this.board, BorderLayout.CENTER);
 
         window.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
         window.addWindowListener(new WindowAdapter() {
@@ -76,7 +87,8 @@ public class GameWindow {
             }
         });
         saveGameButton.addActionListener(e -> {
-            saveGame(); // save current game
+            if (checkIfBoardWasAltered())
+                saveGame(); // save current game
         });
         quitGameButton.addActionListener(e -> {
             if (!checkIfBoardWasAltered() || ignoredWarning("Do you want to exit game without saving?")) {
@@ -108,7 +120,9 @@ public class GameWindow {
                 String fileName = getFileName(fileChooser);
                 //
                 // save game state to xml file /////////////////////////////
-                // saveGame(fileName);
+
+                saveXmlGame(fileName);
+
                 //if(successful save)
                 board.setBoardAltered(false);
                 //
@@ -179,5 +193,24 @@ public class GameWindow {
 
     public Board getBoard() {
         return board;
+    }
+
+    public void saveXmlGame(String filename) {
+        SavedGame game = new SavedGame(this);
+
+        XStream xstream = new XStream();
+        System.out.println(xstream.toXML(game));
+        String xmlGame = xstream.toXML(game);
+
+        // write xml string to the specified file
+        try {
+            FileWriter fileWriter = new FileWriter(filename);
+            fileWriter.write(xmlGame);
+            fileWriter.close();
+            System.out.println("Successfully wrote to the file.");
+        } catch (IOException e) {
+            System.out.println("Error occurred while saving game to xml file");
+            e.printStackTrace();
+        }
     }
 }
