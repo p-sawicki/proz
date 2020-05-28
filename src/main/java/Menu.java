@@ -1,14 +1,8 @@
-import com.thoughtworks.xstream.XStream;
-
 import javax.imageio.ImageIO;
 import javax.swing.*;
-import javax.swing.filechooser.FileNameExtensionFilter;
-import javax.swing.filechooser.FileSystemView;
 import java.awt.*;
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.Random;
 
 
@@ -50,8 +44,7 @@ public class Menu implements Runnable {
         ;
     }
 
-    private void addButtons(JFrame window) { // initialize button panel menu
-
+    private void addButtons(JFrame window) {
         // initialize buttons
         final JButton newGameButton = createMainMenuButton("New game");
         final JButton openGameButton = createMainMenuButton("Load game");
@@ -63,11 +56,7 @@ public class Menu implements Runnable {
             setGameType();
             window.dispose();
         });
-        openGameButton.addActionListener(e -> { // new window must show up with saved games to choose from
-            if (openSavedGame()) { // saved game was successfully resumed
-                window.dispose();
-            }
-        });
+        openGameButton.addActionListener(new ActionOpen(this.menuWindow));
         aboutGameButton.addActionListener(e -> {
             openGameDescription();
         });
@@ -212,34 +201,6 @@ public class Menu implements Runnable {
         });
     }
 
-    private boolean openSavedGame() {
-        // fileChooser parameters
-        JFileChooser jfc = new JFileChooser(FileSystemView.getFileSystemView().getHomeDirectory());
-        jfc.setDialogTitle("Choose a saved game to resume: ");
-        jfc.setAcceptAllFileFilterUsed(false); // restricts file selection to extensions declared below
-        FileNameExtensionFilter filter = new FileNameExtensionFilter("XML files", "xml");
-        jfc.addChoosableFileFilter(filter);
-
-        int returnValue = jfc.showOpenDialog(null);
-
-        if (returnValue == JFileChooser.APPROVE_OPTION) {
-            File selectedFile = jfc.getSelectedFile();
-            String fileName = selectedFile.getAbsolutePath();
-            System.out.println("player has chosen saved game at: " + fileName);
-
-            SavedGame savedGame = createSavedGameFromXml(fileName);
-
-            new GameWindow(savedGame.getPlayerName(), savedGame.createBoard());
-            //setGameParametersAndStartGame("savedName", "savedIP", savedBoard); // opens saved game to resume playing
-        }
-
-        if (returnValue == JFileChooser.CANCEL_OPTION) {
-            return false; // player hasn't chosen saved game
-        }
-
-        return true;
-    }
-
     private void openGameDescription() {
         final JFrame descriptionWindow = new JFrame("About program");
 
@@ -318,20 +279,5 @@ public class Menu implements Runnable {
             playerName = name;
             gameParametersWindow.dispose();
         });
-    }
-
-    public SavedGame createSavedGameFromXml(String fileName) {
-        XStream xstream = new XStream();
-
-        String savedXmlGame = "";
-        try {
-            savedXmlGame = new String (Files.readAllBytes(Paths.get(fileName)));
-            //System.out.println( savedXmlGame );
-        }
-        catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        return (SavedGame) xstream.fromXML(savedXmlGame);
     }
 }
