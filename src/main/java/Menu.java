@@ -14,7 +14,8 @@ public class Menu implements Runnable {
     private JFrame menuWindow;
     private JLabel spacerLabel;
     private JFrame gameParametersWindow;
-    private String playerName;
+    //private String playerName;
+    private GameAttributes gameAttributes;
 
     public Menu() {
         menuConnectionHandler = new MenuConnectionHandler(this);
@@ -31,7 +32,9 @@ public class Menu implements Runnable {
         setBackgroundImage(menuWindow);
         addButtons(menuWindow);
 
-        playerName = "player";
+        this.gameAttributes = new GameAttributes();
+
+        //gameAttributes.setPlayerName("player");
     }
 
     private void setBackgroundImage(JFrame window) {
@@ -56,7 +59,7 @@ public class Menu implements Runnable {
             setGameType();
             window.dispose();
         });
-        openGameButton.addActionListener(new ActionOpen(this.menuWindow));
+        openGameButton.addActionListener(new ActionOpen(this));
         aboutGameButton.addActionListener(e -> {
             openGameDescription();
         });
@@ -105,14 +108,16 @@ public class Menu implements Runnable {
 
         // buttons' listeners
         singlePlayerButton.addActionListener(e -> {
+            gameAttributes.setSinglePlayer(true);
             setGameParametersAndStartGame(true);
         });
         multiPlayerButton.addActionListener(e -> {
+            gameAttributes.setSinglePlayer(false);
             setGameParametersAndStartGame(false);
         });
     }
 
-    private void setGameParametersAndStartGame(boolean singlePlayer) { // asks for player name, opponent IP
+    public void setGameParametersAndStartGame(boolean singlePlayer) { // asks for player name, opponent IP
         gameParametersWindow = new JFrame("Game Parameters");
 
         // window parameters
@@ -151,9 +156,12 @@ public class Menu implements Runnable {
             if (!singlePlayer) {
                 opponentIP = ipField.getText();
             }
+            gameAttributes.setPlayerName(playerName);
+            gameAttributes.setOpponentIP(opponentIP);
+            //gameAttributes.setMenuConnectionHandler(this.menuConnectionHandler);
             if (opponentIP == null) {
                 menuConnectionHandler.stopReceiving();
-                new GameWindow(playerName);
+                new GameWindow(gameAttributes);
             } else {
                 spacerLabel.setText("Waiting...");
                 menuConnectionHandler.challenge(playerName, opponentIP);
@@ -161,9 +169,10 @@ public class Menu implements Runnable {
         });
     }
 
-    private void setGameParametersAndStartGame(boolean singlePlayer, String playerName, String opponentIP, Board board) {
+    public void setGameParametersAndStartGame(GameAttributes savedGameAttributes) { // asks for player name, opponent IP
+        gameParametersWindow = new JFrame("Game Parameters");
+
         // window parameters
-        final JFrame gameParametersWindow = new JFrame("Game Parameters");
         gameParametersWindow.setSize(new Dimension(400, 100));
         gameParametersWindow.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         gameParametersWindow.setVisible(true);
@@ -171,16 +180,16 @@ public class Menu implements Runnable {
 
         // window objects
         JLabel enterNameLabel = new JLabel("  Your name:");
-        JLabel nameField = new JLabel(playerName);
+        JLabel nameField = new JLabel(savedGameAttributes.getPlayerName());
         JLabel enterIPLabel = new JLabel("  Opponent IP:");
-        JLabel ipField = new JLabel(opponentIP);
+        JLabel ipField = new JLabel(savedGameAttributes.getOpponentIP());
         JLabel spacerLabel = new JLabel(""); // Here can be opponent status (like: Opponent is active; Opponent is ready)
         JButton startButton = new JButton("Start");
 
         gameParametersWindow.add(enterNameLabel);
         gameParametersWindow.add(nameField);
 
-        if (!singlePlayer) {
+        if (!savedGameAttributes.isSinglePlayer()) {
             gameParametersWindow.add(enterIPLabel);
             gameParametersWindow.add(ipField);
         }
@@ -190,14 +199,13 @@ public class Menu implements Runnable {
 
         // button listener
         startButton.addActionListener(e -> {
-            //new GameWindow(playerName, board);
-            new GameWindow(playerName);
-            // setConnectionHandler with opponentIP;
-            /*if(opponentISNotReady) {
-                System.out.println("opponent not ready");
-                return;
-            }*/
-            gameParametersWindow.dispose();
+            if (savedGameAttributes.isSinglePlayer()) {
+                menuConnectionHandler.stopReceiving();
+                new GameWindow(savedGameAttributes);
+            } else {
+                spacerLabel.setText("Waiting...");
+                menuConnectionHandler.challenge(savedGameAttributes.getPlayerName(), savedGameAttributes.getOpponentIP());
+            }
         });
     }
 
@@ -212,38 +220,46 @@ public class Menu implements Runnable {
                 JOptionPane.INFORMATION_MESSAGE, icon);
     }
 
-    public void onOpponentChallenge(String opponentName, String address) {
+    public void onOpponentChallenge(String opponentName, String opponentAddress) {
         final JFrame challengeWindow = new JFrame("Challenge Window");
-        challengeWindow.setSize(new Dimension(720, 100));
+        challengeWindow.setSize(new Dimension(400, 300));
         challengeWindow.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         challengeWindow.setVisible(true);
         challengeWindow.setLayout(new GridLayout(2, 2));
 
         challengeWindow.add(new JLabel("You've been challenged to a game!"));
-        challengeWindow.add(new JLabel("Opponent name: " + opponentName + " IP: " + address));
+        challengeWindow.add(new JLabel("Opponent name: " + opponentName + " IP: " + opponentAddress));
         JButton acceptButton = new JButton("Accept");
         JButton declineButton = new JButton("Decline");
         challengeWindow.add(acceptButton);
         challengeWindow.add(declineButton);
 
         acceptButton.addActionListener(e -> {
-            Cell.Colour colour = (new Random()).nextInt(2) == 0 ? Cell.Colour.black : Cell.Colour.white;
+            gameAttributes.setOpponentName(opponentName);
+            gameAttributes.setOpponentIP(opponentAddress);
+
+            Cell.Colour myColour = (new Random()).nextInt(2) == 0 ? Cell.Colour.black : Cell.Colour.white;
+            gameAttributes.setPlayerColour(myColour);
             enterPlayerName();
-            String playerName = this.playerName;
-            menuConnectionHandler.accept(address, colour == Cell.Colour.black ? Cell.Colour.white : Cell.Colour.black, playerName);
-            new GameWindow(playerName, null, colour, new ConnectionHandler(address, null), menuConnectionHandler, opponentName);
+            menuConnectionHandler.accept(opponentAddress, myColour == Cell.Colour.black ? Cell.Colour.white : Cell.Colour.black, gameAttributes.getPlayerName());
+            gameAttributes.setConnectionHandler(new ConnectionHandler(opponentAddress, null));
+            new GameWindow(gameAttributes);
+            menuConnectionHandler.stopReceiving(); // stop receiving because player is in game
             challengeWindow.dispose();
             menuWindow.dispose();
         });
 
         declineButton.addActionListener(e -> {
-            menuConnectionHandler.decline(address);
+            menuConnectionHandler.decline(opponentAddress);
             challengeWindow.dispose();
         });
     }
 
-    public void onChallengeAccepted(Cell.Colour colour, String address, String opponentName) {
-        new GameWindow(this.playerName, null, colour, new ConnectionHandler(address, null), menuConnectionHandler, opponentName);
+    public void onChallengeAccepted(Cell.Colour colour, String opponentAddress, String opponentName) {
+        gameAttributes.setPlayerColour(colour);
+        gameAttributes.setConnectionHandler(new ConnectionHandler(opponentAddress, null));
+        new GameWindow(this.gameAttributes);
+        menuConnectionHandler.stopReceiving();
         gameParametersWindow.dispose();
     }
 
@@ -276,8 +292,12 @@ public class Menu implements Runnable {
                 System.out.println("player hasn't entered his name");
                 return;
             }
-            playerName = name;
+            gameAttributes.setPlayerName(name);
             gameParametersWindow.dispose();
         });
+    }
+
+    public JFrame getMenuWindow() {
+        return menuWindow;
     }
 }

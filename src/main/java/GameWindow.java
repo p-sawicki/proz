@@ -10,8 +10,9 @@ public class GameWindow {
     private Board board;
     private String playerName;
     private String opponentName;
-    private final ConnectionHandler connectionHandler;
-
+    private String opponentIP;
+    private ConnectionHandler connectionHandler;
+/*
     public GameWindow(String playerName) {
         this(playerName, null, Cell.Colour.white, null, null, "");
     }
@@ -34,6 +35,41 @@ public class GameWindow {
         }
         setPlayerName(playerName);
         setOpponentName(opponentName);
+
+        window.add(this.board, BorderLayout.CENTER);
+
+        window.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
+        window.addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowClosing(WindowEvent e) {
+                if (ignoredWarning("Do you want to exit game?")) {
+                    System.exit(0);
+                }
+            }
+        });
+        window.setVisible(true);
+
+        initializeGameMenuBar(window);
+        window.pack();
+    }
+*/
+
+    public GameWindow(GameAttributes gameAttributes) {
+        window = new JFrame("Chess");
+        window.setLayout(new BorderLayout(10, 10));
+
+        this.connectionHandler = gameAttributes.getConnectionHandler();
+
+        /*if (menuConnectionHandler != null)
+            menuConnectionHandler.stopReceiving();*/
+
+        if (gameAttributes.getBoard() != null) {
+            this.board = gameAttributes.getBoard();
+        } else {
+            this.board = new Board(gameAttributes.getPlayerColour(), gameAttributes.getConnectionHandler());
+        }
+        setPlayerName(gameAttributes.getPlayerName());
+        setOpponentName(gameAttributes.getOpponentName());
 
         window.add(this.board, BorderLayout.CENTER);
 
@@ -77,10 +113,6 @@ public class GameWindow {
                     connectionHandler.stopReceiving();
             }
         });
-       /* saveGameButton.addActionListener(e -> {
-            if (checkIfBoardWasAltered())
-                saveGame(); // save current game
-        });*/
        saveGameButton.addActionListener(new ActionSaveAs(this));
         quitGameButton.addActionListener(e -> {
             if (!checkIfBoardWasAltered() || ignoredWarning("Do you want to exit game without saving?")) {
@@ -113,27 +145,37 @@ public class GameWindow {
         return yesResponse;
     }
 
-    public String getPlayerName() {
-        return playerName;
+    public boolean checkIfBoardWasAltered() {
+        return board.checkIfBoardAltered();
     }
 
-    public void setPlayerName(String playerName) {
-        this.playerName = playerName;
+    // getters
+    public Board getBoard() {
+        return board;
+    }
+
+    public String getPlayerName() {
+        return playerName;
     }
 
     public String getOpponentName() {
         return opponentName;
     }
 
+    public String getOpponentIP() {
+        return this.opponentIP;
+    }
+
+    // setters
+    public void setPlayerName(String playerName) {
+        this.playerName = playerName;
+    }
+
     public void setOpponentName(String opponentName) {
         this.opponentName = opponentName;
     }
 
-    public Board getBoard() {
-        return board;
-    }
-
-    public boolean checkIfBoardWasAltered() {
-        return board.checkIfBoardAltered();
+    public void setOpponentIP(String opponentIP) {
+        this.opponentIP = opponentIP;
     }
 }

@@ -11,16 +11,16 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 
 public class ActionOpen implements ActionListener {
-    private final JFrame menuWindow;
+    private final Menu menu;
 
-    public ActionOpen(JFrame window) {
-        this.menuWindow = window;
+    public ActionOpen(Menu menu) {
+        this.menu = menu;
     }
 
     @Override
     public void actionPerformed(ActionEvent e) {
         if (openSavedGame()) { // saved game successfully resumed
-            menuWindow.dispose();
+            menu.getMenuWindow().dispose();
         }
     }
 
@@ -41,8 +41,8 @@ public class ActionOpen implements ActionListener {
 
             SavedGame savedGame = createSavedGameFromXml(fileName);
 
-            new GameWindow(savedGame.getPlayerName(), savedGame.createBoard());
-            //setGameParametersAndStartGame("savedName", "savedIP", savedBoard); // opens saved game to resume playing
+            GameAttributes savedGameAttr = savedGame.createGameAttributes();
+            menu.setGameParametersAndStartGame(savedGameAttr);
         }
 
         if (returnValue == JFileChooser.CANCEL_OPTION) {
