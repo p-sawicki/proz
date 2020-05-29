@@ -42,7 +42,7 @@ public class ActionOpen implements ActionListener {
             SavedGame savedGame = createSavedGameFromXml(fileName);
 
             GameAttributes savedGameAttr = savedGame.createGameAttributes();
-            menu.setGameParametersAndStartGame(savedGameAttr);
+            menu.resumeSavedGame(savedGameAttr);
         }
 
         if (returnValue == JFileChooser.CANCEL_OPTION) {

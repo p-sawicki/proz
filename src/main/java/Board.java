@@ -3,20 +3,20 @@ import java.awt.*;
 import java.awt.event.*;
 
 public class Board extends JPanel implements MouseListener {
-    private final Cell[][] cells;
     private final int size = 8;
     private final int windowHeight = 720;
     private final int windowWidth = 720;
     private final Dimension windowSize = new Dimension(windowWidth, windowHeight);
-    private boolean isBoardAltered; // true if current board state isn't saved
-    private final Cell.Colour playerColour;
 
+    private final Cell[][] cells;
+    private boolean isBoardAltered; // true if current board state isn't saved
+    private boolean singlePlayer;
+    private Cell.Colour playerColour;
     private boolean whiteTurn;
     private boolean enableGame;
+    private ConnectionHandler connectionHandler;
     private Point clickedCellPosition = new Point(-1, -1);
     private final Point nullPosition = new Point(-1, -1);
-    private ConnectionHandler connectionHandler;
-    private boolean singlePlayer;
 
     //starting board state
     private final Piece[][] pieces = {
@@ -120,14 +120,12 @@ public class Board extends JPanel implements MouseListener {
         }
     }
 
-    public Board(Cell[][] cells, boolean singlePlayer, Cell.Colour playerColour, boolean whiteTurn, boolean enableGame) {
+    public Board(Cell[][] cells, boolean whiteTurn, boolean enableGame) {
         this.cells = new Cell[size][size];
-        this.playerColour = playerColour;
         this.whiteTurn = whiteTurn;
         this.enableGame = enableGame;
-        this.singlePlayer = singlePlayer;
-        if (singlePlayer)
-            this.connectionHandler = null;
+        this.singlePlayer = true;
+        this.connectionHandler = null;
         setBoardAltered(false);
 
         this.addMouseListener(this);
@@ -179,7 +177,9 @@ public class Board extends JPanel implements MouseListener {
         return size;
     }
 
-    public boolean checkIfSinglePlayer() { return singlePlayer; }
+    public boolean checkIfSinglePlayer() {
+        return singlePlayer;
+    }
 
     public boolean checkIfBoardAltered() {
         return isBoardAltered;

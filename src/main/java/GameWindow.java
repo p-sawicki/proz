@@ -12,56 +12,12 @@ public class GameWindow {
     private String opponentName;
     private String opponentIP;
     private ConnectionHandler connectionHandler;
-/*
-    public GameWindow(String playerName) {
-        this(playerName, null, Cell.Colour.white, null, null, "");
-    }
-
-    public GameWindow(String playerName, Board board) { this(playerName, board, Cell.Colour.white, null, null, ""); }
-
-    public GameWindow(String playerName, Board board, Cell.Colour playerColour, ConnectionHandler connectionHandler, MenuConnectionHandler menuConnectionHandler, String opponentName) {
-        window = new JFrame("Chess");
-        window.setLayout(new BorderLayout(10, 10));
-
-        this.connectionHandler = connectionHandler;
-
-        if (menuConnectionHandler != null)
-            menuConnectionHandler.stopReceiving();
-
-        if (board != null) {
-            this.board = board;
-        } else {
-            this.board = new Board(playerColour, connectionHandler);
-        }
-        setPlayerName(playerName);
-        setOpponentName(opponentName);
-
-        window.add(this.board, BorderLayout.CENTER);
-
-        window.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
-        window.addWindowListener(new WindowAdapter() {
-            @Override
-            public void windowClosing(WindowEvent e) {
-                if (ignoredWarning("Do you want to exit game?")) {
-                    System.exit(0);
-                }
-            }
-        });
-        window.setVisible(true);
-
-        initializeGameMenuBar(window);
-        window.pack();
-    }
-*/
 
     public GameWindow(GameAttributes gameAttributes) {
         window = new JFrame("Chess");
         window.setLayout(new BorderLayout(10, 10));
 
         this.connectionHandler = gameAttributes.getConnectionHandler();
-
-        /*if (menuConnectionHandler != null)
-            menuConnectionHandler.stopReceiving();*/
 
         if (gameAttributes.getBoard() != null) {
             this.board = gameAttributes.getBoard();
@@ -106,16 +62,16 @@ public class GameWindow {
         goBackToMenuButton.addActionListener(e -> {
             // if at least 1 move was made, ask player if he wants to exit a game without save
             // if he is playing with another player then notify another player
-            if (!checkIfBoardWasAltered() || ignoredWarning("Do you want to exit game without saving?")) {
+            if (!checkIfSaveIsPossible() || ignoredWarning("Do you want to exit game without saving?")) {
                 SwingUtilities.invokeLater(new Menu());
                 window.dispose();
                 if (connectionHandler != null)
                     connectionHandler.stopReceiving();
             }
         });
-       saveGameButton.addActionListener(new ActionSaveAs(this));
+        saveGameButton.addActionListener(new ActionSaveAs(this));
         quitGameButton.addActionListener(e -> {
-            if (!checkIfBoardWasAltered() || ignoredWarning("Do you want to exit game without saving?")) {
+            if (!checkIfSaveIsPossible() || ignoredWarning("Do you want to exit game without saving?")) {
                 System.exit(0);
             }
         });
@@ -123,7 +79,8 @@ public class GameWindow {
         // Menu bar in game
         JMenuBar menuBar = new JMenuBar();
         menuBar.add(goBackToMenuButton);
-        menuBar.add(saveGameButton);
+        if(isSinglePlayer())
+            menuBar.add(saveGameButton);
         menuBar.add(quitGameButton);
         menuBar.add(playerNameLabel);
         window.setJMenuBar(menuBar);
@@ -145,8 +102,12 @@ public class GameWindow {
         return yesResponse;
     }
 
-    public boolean checkIfBoardWasAltered() {
-        return board.checkIfBoardAltered();
+    public boolean checkIfSaveIsPossible() {
+        return board.checkIfBoardAltered() && isSinglePlayer();
+    }
+
+    public boolean isSinglePlayer() {
+        return board.checkIfSinglePlayer();
     }
 
     // getters
