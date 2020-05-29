@@ -14,7 +14,6 @@ public class Menu implements Runnable {
     private JFrame menuWindow;
     private JLabel spacerLabel;
     private JFrame gameParametersWindow;
-    //private String playerName;
     private GameAttributes gameAttributes;
 
     public Menu() {
@@ -33,8 +32,6 @@ public class Menu implements Runnable {
         addButtons(menuWindow);
 
         this.gameAttributes = new GameAttributes();
-
-        //gameAttributes.setPlayerName("player");
     }
 
     private void setBackgroundImage(JFrame window) {
@@ -50,7 +47,7 @@ public class Menu implements Runnable {
     private void addButtons(JFrame window) {
         // initialize buttons
         final JButton newGameButton = createMainMenuButton("New game");
-        final JButton openGameButton = createMainMenuButton("Load game");
+        final JButton loadGameButton = createMainMenuButton("Load game");
         final JButton aboutGameButton = createMainMenuButton("About game");
         final JButton quitGameButton = createMainMenuButton("Quit game");
 
@@ -59,7 +56,7 @@ public class Menu implements Runnable {
             setGameType();
             window.dispose();
         });
-        openGameButton.addActionListener(new ActionOpen(this));
+        loadGameButton.addActionListener(new ActionOpen(this));
         aboutGameButton.addActionListener(e -> {
             openGameDescription();
         });
@@ -76,7 +73,7 @@ public class Menu implements Runnable {
         buttonPanel.setOpaque(false);
 
         buttonPanel.add(newGameButton);
-        buttonPanel.add(openGameButton);
+        buttonPanel.add(loadGameButton);
         buttonPanel.add(aboutGameButton);
         buttonPanel.add(quitGameButton);
         window.add(buttonPanel);
@@ -109,22 +106,16 @@ public class Menu implements Runnable {
         // buttons' listeners
         singlePlayerButton.addActionListener(e -> {
             gameAttributes.setSinglePlayer(true);
-            setGameParametersAndStartGame(true);
+            startNewGame(true);
         });
         multiPlayerButton.addActionListener(e -> {
             gameAttributes.setSinglePlayer(false);
-            setGameParametersAndStartGame(false);
+            startNewGame(false);
         });
     }
 
-    public void setGameParametersAndStartGame(boolean singlePlayer) { // asks for player name, opponent IP
-        gameParametersWindow = new JFrame("Game Parameters");
-
-        // window parameters
-        gameParametersWindow.setSize(new Dimension(400, 100));
-        gameParametersWindow.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        gameParametersWindow.setVisible(true);
-        gameParametersWindow.setLayout(new GridLayout(3, 2));
+    public void startNewGame(boolean singlePlayer) { // asks for player name, opponent IP
+        createGameParametersWindow(3);
 
         // window objects
         JLabel enterNameLabel = new JLabel("  Please enter your name:");
@@ -158,7 +149,6 @@ public class Menu implements Runnable {
             }
             gameAttributes.setPlayerName(playerName);
             gameAttributes.setOpponentIP(opponentIP);
-            //gameAttributes.setMenuConnectionHandler(this.menuConnectionHandler);
             if (opponentIP == null) {
                 menuConnectionHandler.stopReceiving();
                 new GameWindow(gameAttributes);
@@ -169,47 +159,28 @@ public class Menu implements Runnable {
         });
     }
 
-    public void setGameParametersAndStartGame(GameAttributes savedGameAttributes) { // asks for player name, opponent IP
-        gameParametersWindow = new JFrame("Game Parameters");
-
-        // window parameters
-        gameParametersWindow.setSize(new Dimension(400, 100));
-        gameParametersWindow.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        gameParametersWindow.setVisible(true);
-        gameParametersWindow.setLayout(new GridLayout(3, 2));
+    public void resumeSavedGame(GameAttributes savedGameAttributes) { // resumes saved game
+        createGameParametersWindow(2);
 
         // window objects
         JLabel enterNameLabel = new JLabel("  Your name:");
         JLabel nameField = new JLabel(savedGameAttributes.getPlayerName());
-        JLabel enterIPLabel = new JLabel("  Opponent IP:");
-        JLabel ipField = new JLabel(savedGameAttributes.getOpponentIP());
-        JLabel spacerLabel = new JLabel(""); // Here can be opponent status (like: Opponent is active; Opponent is ready)
+        JLabel spacerLabel = new JLabel("");
         JButton startButton = new JButton("Start");
 
         gameParametersWindow.add(enterNameLabel);
         gameParametersWindow.add(nameField);
-
-        if (!savedGameAttributes.isSinglePlayer()) {
-            gameParametersWindow.add(enterIPLabel);
-            gameParametersWindow.add(ipField);
-        }
-
         gameParametersWindow.add(spacerLabel);
         gameParametersWindow.add(startButton);
 
         // button listener
         startButton.addActionListener(e -> {
-            if (savedGameAttributes.isSinglePlayer()) {
                 menuConnectionHandler.stopReceiving();
                 new GameWindow(savedGameAttributes);
-            } else {
-                spacerLabel.setText("Waiting...");
-                menuConnectionHandler.challenge(savedGameAttributes.getPlayerName(), savedGameAttributes.getOpponentIP());
-            }
         });
     }
 
-    private void openGameDescription() {
+    public void openGameDescription() {
         final JFrame descriptionWindow = new JFrame("About program");
 
         ImageIcon icon = new ImageIcon(Utility.getResourcePath() + "gameLogo.png");
@@ -268,11 +239,7 @@ public class Menu implements Runnable {
     }
 
     public void enterPlayerName() {
-        gameParametersWindow = new JFrame("Game Parameters");
-        gameParametersWindow.setSize(new Dimension(400, 100));
-        gameParametersWindow.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        gameParametersWindow.setVisible(true);
-        gameParametersWindow.setLayout(new GridLayout(2, 2));
+        createGameParametersWindow(2);
 
         // window objects
         JLabel enterNameLabel = new JLabel("  Please enter your name:");
@@ -299,5 +266,15 @@ public class Menu implements Runnable {
 
     public JFrame getMenuWindow() {
         return menuWindow;
+    }
+
+    public void createGameParametersWindow(int rows) {
+        gameParametersWindow = new JFrame("Game Parameters");
+
+        // window parameters
+        gameParametersWindow.setSize(new Dimension(400, 100));
+        gameParametersWindow.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        gameParametersWindow.setVisible(true);
+        gameParametersWindow.setLayout(new GridLayout(rows, 2));
     }
 }

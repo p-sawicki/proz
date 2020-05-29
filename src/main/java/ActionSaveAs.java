@@ -19,7 +19,7 @@ public class ActionSaveAs implements ActionListener {
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        if (gameWindow.checkIfBoardWasAltered())
+        if (gameWindow.checkIfSaveIsPossible())
             saveGame(); // save current game
     }
 

@@ -3,11 +3,7 @@ import java.util.List;
 
 public class SavedGame {
     private String programVersion = "1.0"; // in case modified program won't support old files
-    private boolean singlePlayer;
     private String playerName;
-    private Cell.Colour playerColour;
-    private String opponentName;
-    private String opponentIP;
     private boolean whiteTurn;
     private List<SavedCell> cellsList;
     //private GameStatus status;
@@ -19,11 +15,7 @@ public class SavedGame {
         this.cellsList = new ArrayList<SavedCell>();
 
         // initialize saved Game values
-        this.singlePlayer = board.checkIfSinglePlayer();
         this.playerName = gameWindow.getPlayerName();
-        this.playerColour = board.getPlayerColour();
-        this.opponentName = gameWindow.getOpponentName();
-        //this.opponentIP =
         this.whiteTurn = board.getWhiteTurn();
 
         // initialize list of cells
@@ -52,17 +44,13 @@ public class SavedGame {
             }
         }
 
-        return new Board(cells, this.singlePlayer, this.playerColour, this.whiteTurn, true);
+        return new Board(cells, this.whiteTurn, true);
     }
 
     public GameAttributes createGameAttributes() {
         GameAttributes savedGameAttr = new GameAttributes();
         savedGameAttr.setBoard(restoreBoard());
-        savedGameAttr.setSinglePlayer(singlePlayer);
         savedGameAttr.setPlayerName(playerName);
-        savedGameAttr.setPlayerColour(playerColour);
-        savedGameAttr.setOpponentName(opponentName);
-        savedGameAttr.setOpponentIP(opponentIP);
         return savedGameAttr;
     }
 }
