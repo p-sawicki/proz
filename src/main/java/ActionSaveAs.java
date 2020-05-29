@@ -36,14 +36,9 @@ public class ActionSaveAs implements ActionListener {
             File selectedFile = fileChooser.getSelectedFile();
             if (!selectedFile.exists() || gameWindow.ignoredWarning("Do you want to overwrite data in file?")) { // prevents overwriting existing file without player consent
                 String fileName = getFileName(fileChooser);
-                //
-                // save game state to xml file /////////////////////////////
-
                 saveXmlGame(fileName);
 
-                //if(successful save)
                 gameWindow.getBoard().setBoardAltered(false);
-                //
             }
         }
     }
@@ -77,7 +72,7 @@ public class ActionSaveAs implements ActionListener {
         SavedGame game = new SavedGame(gameWindow);
 
         XStream xstream = new XStream();
-        System.out.println(xstream.toXML(game));
+        //System.out.println(xstream.toXML(game));
         String xmlGame = xstream.toXML(game);
 
         // write xml string to the specified file
@@ -85,7 +80,7 @@ public class ActionSaveAs implements ActionListener {
             FileWriter fileWriter = new FileWriter(filename);
             fileWriter.write(xmlGame);
             fileWriter.close();
-            System.out.println("Successfully wrote to the file.");
+            System.out.println("Successfully saved game to xml file");
         } catch (IOException e) {
             System.out.println("Error occurred while saving game to xml file");
             e.printStackTrace();

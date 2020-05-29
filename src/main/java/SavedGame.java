@@ -7,7 +7,7 @@ public class SavedGame {
     private String playerName;
     private Cell.Colour playerColour;
     private String opponentName;
-    //private String opponentIP;
+    private String opponentIP;
     private boolean whiteTurn;
     private List<SavedCell> cellsList;
     //private GameStatus status;
@@ -16,14 +16,15 @@ public class SavedGame {
 
     SavedGame(GameWindow gameWindow) {
         Board board = gameWindow.getBoard();
-        cellsList = new ArrayList<SavedCell>();
+        this.cellsList = new ArrayList<SavedCell>();
 
         // initialize saved Game values
-        singlePlayer = board.checkIfSinglePlayer();
-        playerName = gameWindow.getPlayerName();
-        playerColour = board.getPlayerColour();
-        opponentName = gameWindow.getOpponentName();
-        whiteTurn = board.getWhiteTurn();
+        this.singlePlayer = board.checkIfSinglePlayer();
+        this.playerName = gameWindow.getPlayerName();
+        this.playerColour = board.getPlayerColour();
+        this.opponentName = gameWindow.getOpponentName();
+        //this.opponentIP =
+        this.whiteTurn = board.getWhiteTurn();
 
         // initialize list of cells
         Cell[][] cells = board.getCells();
@@ -38,7 +39,7 @@ public class SavedGame {
         }
     }
 
-    public Board createBoard() {
+    public Board restoreBoard() {
         int size = 8;
         Cell[][] cells = new Cell[size][size];
 
@@ -54,7 +55,14 @@ public class SavedGame {
         return new Board(cells, this.singlePlayer, this.playerColour, this.whiteTurn, true);
     }
 
-    public String getPlayerName() {
-        return playerName;
+    public GameAttributes createGameAttributes() {
+        GameAttributes savedGameAttr = new GameAttributes();
+        savedGameAttr.setBoard(restoreBoard());
+        savedGameAttr.setSinglePlayer(singlePlayer);
+        savedGameAttr.setPlayerName(playerName);
+        savedGameAttr.setPlayerColour(playerColour);
+        savedGameAttr.setOpponentName(opponentName);
+        savedGameAttr.setOpponentIP(opponentIP);
+        return savedGameAttr;
     }
 }

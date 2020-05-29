@@ -30,14 +30,14 @@ public class MenuConnectionHandler extends Thread {
                 Socket incomingConnection = serverSocket.accept();
                 DataInputStream dataInputStream = new DataInputStream(incomingConnection.getInputStream());
                 String[] message = dataInputStream.readUTF().split(" ");
-                String address = incomingConnection.getInetAddress().getHostAddress();
+                String opponentAddress = incomingConnection.getInetAddress().getHostAddress();
                 incomingConnection.close();
                 switch (message[0]) {
                     case "C":
-                        menu.onOpponentChallenge(message[1], address);
+                        menu.onOpponentChallenge(message[1], opponentAddress);
                         break;
                     case "A":
-                        menu.onChallengeAccepted(message[1].equals("B") ? Cell.Colour.black : Cell.Colour.white, address, message[2]);
+                        menu.onChallengeAccepted(message[1].equals("B") ? Cell.Colour.black : Cell.Colour.white, opponentAddress, message[2]);
                         break;
                     case "D":
                         menu.onChallengeDeclined();
@@ -50,9 +50,9 @@ public class MenuConnectionHandler extends Thread {
         }
     }
 
-    private void sendMessage(String address, String message) {
+    private void sendMessage(String opponentAddress, String message) {
         try {
-            Socket socket = new Socket(address, port);
+            Socket socket = new Socket(opponentAddress, port);
             DataOutputStream dataOutputStream = new DataOutputStream(socket.getOutputStream());
             dataOutputStream.writeUTF(message);
             socket.close();
@@ -61,16 +61,16 @@ public class MenuConnectionHandler extends Thread {
         }
     }
 
-    public void challenge(String name, String address) {
-        sendMessage(address, "C " + name);
+    public void challenge(String myName, String opponentAddress) {
+        sendMessage(opponentAddress, "C " + myName);
     }
 
-    public void accept(String address, Cell.Colour colour, String myName) {
-        sendMessage(address, "A " + (colour == Cell.Colour.black ? "B" : "W") + " " + myName);
+    public void accept(String opponentAddress, Cell.Colour colour, String myName) {
+        sendMessage(opponentAddress, "A " + (colour == Cell.Colour.black ? "B" : "W") + " " + myName);
     }
 
-    public void decline(String address) {
-        sendMessage(address, "D");
+    public void decline(String opponentAddress) {
+        sendMessage(opponentAddress, "D");
     }
 
     public void stopReceiving() {
