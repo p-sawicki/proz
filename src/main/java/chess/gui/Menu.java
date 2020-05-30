@@ -1,17 +1,16 @@
 package chess.gui;
 
+import chess.actions.ActionAboutGame;
+import chess.actions.ActionNewGame;
 import chess.actions.ActionOpen;
-import chess.mechanics.Cell;
-import chess.network.*;
-import chess.utilities.*;
+import chess.network.MenuConnectionHandler;
+import chess.utilities.Utility;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
 import java.io.File;
 import java.io.IOException;
-import java.util.Random;
-
 
 public class Menu implements Runnable {
     private final int windowHeight = 720;
@@ -19,8 +18,6 @@ public class Menu implements Runnable {
     private final Dimension windowSize = new Dimension(windowWidth, windowHeight);
     private final MenuConnectionHandler menuConnectionHandler;
     private JFrame menuWindow;
-    private JLabel spacerLabel;
-    private GameAttributes gameAttributes;
 
     public Menu() {
         menuConnectionHandler = new MenuConnectionHandler(this);
@@ -36,8 +33,6 @@ public class Menu implements Runnable {
 
         setBackgroundImage(menuWindow);
         addButtons(menuWindow);
-
-        this.gameAttributes = new GameAttributes();
     }
 
     private void setBackgroundImage(JFrame window) {
@@ -58,14 +53,9 @@ public class Menu implements Runnable {
         final JButton quitGameButton = createMainMenuButton("Quit game");
 
         // buttons' listeners
-        newGameButton.addActionListener(e -> {
-            setGameType();
-            //window.dispose();
-        });
+        newGameButton.addActionListener(new ActionNewGame(this));
         loadGameButton.addActionListener(new ActionOpen(this));
-        aboutGameButton.addActionListener(e -> {
-            openGameDescription();
-        });
+        aboutGameButton.addActionListener(new ActionAboutGame());
         quitGameButton.addActionListener(e -> {
             System.exit(0);
         });
@@ -92,178 +82,11 @@ public class Menu implements Runnable {
         return newButton;
     }
 
-    private void setGameType() {
-        // window parameters
-        JFrame gameParametersWindow = createGameParametersWindow(3,1);
-
-        // window objects
-        JLabel enterNameLabel = new JLabel("  Please select game type:");
-        JButton singlePlayerButton = new JButton("Single player");
-        JButton multiPlayerButton = new JButton("Multiplayer");
-
-        gameParametersWindow.add(enterNameLabel);
-        gameParametersWindow.add(singlePlayerButton);
-        gameParametersWindow.add(multiPlayerButton);
-
-        // buttons' listeners
-        singlePlayerButton.addActionListener(e -> {
-            gameAttributes.setSinglePlayer(true);
-            startNewGame(true);
-            gameParametersWindow.dispose();
-        });
-        multiPlayerButton.addActionListener(e -> {
-            gameAttributes.setSinglePlayer(false);
-            startNewGame(false);
-            gameParametersWindow.dispose();
-        });
-    }
-
-    public void startNewGame(boolean singlePlayer) { // asks for player name, opponent IP
-        JFrame gameParametersWindow = createGameParametersWindow(3, 2);
-
-        // window objects
-        JLabel enterNameLabel = new JLabel("  Please enter your name:");
-        JTextField nameField = new JTextField();
-        JLabel enterIPLabel = new JLabel("  Please enter opponent IP:");
-        JTextField ipField = new JTextField();
-        spacerLabel = new JLabel("");
-        JButton startButton = new JButton("Start");
-
-        gameParametersWindow.add(enterNameLabel);
-        gameParametersWindow.add(nameField);
-
-        if (!singlePlayer) {
-            gameParametersWindow.add(enterIPLabel);
-            gameParametersWindow.add(ipField);
-        }
-
-        gameParametersWindow.add(spacerLabel);
-        gameParametersWindow.add(startButton);
-
-        // button listener
-        startButton.addActionListener(e -> {
-            String playerName = nameField.getText();
-            if (playerName.equals("")) {
-                System.out.println("player hasn't entered his name");
-                return;
-            }
-            String opponentIP = null;
-            if (!singlePlayer) {
-                opponentIP = ipField.getText();
-            }
-            gameAttributes.setPlayerName(playerName);
-            gameAttributes.setOpponentIP(opponentIP);
-            if (opponentIP == null) {
-                menuConnectionHandler.stopReceiving();
-                new GameWindow(gameAttributes);
-                menuWindow.dispose();
-            } else {
-                spacerLabel.setText("Waiting...");
-                menuConnectionHandler.challenge(playerName, opponentIP);
-            }
-            gameParametersWindow.dispose();
-        });
-    }
-
-    public void openGameDescription() {
-        final JFrame descriptionWindow = new JFrame("About program");
-
-        ImageIcon icon = new ImageIcon(Utility.getResourcePath() + "gameLogo.png");
-        System.out.println("Trying to get game loga at: " + Utility.getResourcePath() + "gameLogo.png");
-        JOptionPane.showMessageDialog(descriptionWindow,
-                "\n" + "Program title: \"Chess\"" + "\n\n" + "Version: 1.0" + "\n\n" + "Authors: Piotr Sawicki, Vladyslav Kyryk" + "\n",
-                "About program",
-                JOptionPane.INFORMATION_MESSAGE, icon);
-    }
-
-    public void onOpponentChallenge(String opponentName, String opponentAddress) {
-        final JFrame challengeWindow = new JFrame("Challenge Window");
-        challengeWindow.setSize(new Dimension(500, 100));
-        challengeWindow.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-        challengeWindow.setVisible(true);
-        challengeWindow.setLayout(new GridLayout(2, 2));
-
-        challengeWindow.add(new JLabel("  You've been challenged to a game!"));
-        challengeWindow.add(new JLabel("Opponent name: " + opponentName + " IP: " + opponentAddress));
-        JButton acceptButton = new JButton("Accept");
-        JButton declineButton = new JButton("Decline");
-        challengeWindow.add(acceptButton);
-        challengeWindow.add(declineButton);
-
-        acceptButton.addActionListener(e -> {
-            gameAttributes.setOpponentName(opponentName);
-            gameAttributes.setOpponentIP(opponentAddress);
-
-            Cell.Colour myColour = (new Random()).nextInt(2) == 0 ? Cell.Colour.black : Cell.Colour.white;
-            gameAttributes.setPlayerColour(myColour);
-            enterPlayerName();
-            menuConnectionHandler.accept(opponentAddress, myColour == Cell.Colour.black ? Cell.Colour.white : Cell.Colour.black, gameAttributes.getPlayerName());
-            gameAttributes.setConnectionHandler(new ConnectionHandler(opponentAddress, null));
-            new GameWindow(gameAttributes);
-            menuConnectionHandler.stopReceiving(); // stop receiving because player is in game
-            challengeWindow.dispose();
-            menuWindow.dispose();
-        });
-
-        declineButton.addActionListener(e -> {
-            menuConnectionHandler.decline(opponentAddress);
-            challengeWindow.dispose();
-        });
-    }
-
-    public void onChallengeAccepted(Cell.Colour colour, String opponentAddress, String opponentName) {
-        gameAttributes.setPlayerColour(colour);
-        gameAttributes.setConnectionHandler(new ConnectionHandler(opponentAddress, null));
-        new GameWindow(this.gameAttributes);
-        menuConnectionHandler.stopReceiving();
-    }
-
-    public void onChallengeDeclined() {
-        spacerLabel.setText("Declined!");
-    }
-
-    public void enterPlayerName() {
-        JFrame gameParametersWindow = createGameParametersWindow(2, 2);
-
-        // window objects
-        JLabel enterNameLabel = new JLabel("  Please enter your name:");
-        JTextField nameField = new JTextField();
-        spacerLabel = new JLabel("");
-        JButton startButton = new JButton("Start");
-
-        gameParametersWindow.add(enterNameLabel);
-        gameParametersWindow.add(nameField);
-        gameParametersWindow.add(spacerLabel);
-        gameParametersWindow.add(startButton);
-
-        // button listener
-        startButton.addActionListener(e -> {
-            String name = nameField.getText();
-            if (name.equals("")) {
-                System.out.println("player hasn't entered his name");
-                return;
-            }
-            gameAttributes.setPlayerName(name);
-            gameParametersWindow.dispose();
-        });
-    }
-
     public JFrame getMenuWindow() {
         return menuWindow;
     }
 
     public MenuConnectionHandler getMenuConnectionHandler() {
         return this.menuConnectionHandler;
-    }
-
-    public JFrame createGameParametersWindow(int rows, int columns) {
-        JFrame gameParametersWindow = new JFrame("Game Parameters");
-
-        // window parameters
-        gameParametersWindow.setSize(new Dimension(400, 100));
-        gameParametersWindow.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-        gameParametersWindow.setVisible(true);
-        gameParametersWindow.setLayout(new GridLayout(rows, columns));
-        return gameParametersWindow;
     }
 }

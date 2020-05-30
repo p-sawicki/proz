@@ -2,7 +2,9 @@ package chess.network;
 
 import chess.gui.Menu;
 import chess.mechanics.Cell;
+import chess.utilities.GameAttributes;
 
+import javax.swing.*;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
@@ -15,6 +17,7 @@ public class MenuConnectionHandler extends Thread {
     private final Menu menu;
     private boolean running;
     private ServerSocket serverSocket;
+    private Multiplayer multiplayer;
 
     public MenuConnectionHandler(Menu menu) {
         this.menu = menu;
@@ -25,6 +28,7 @@ public class MenuConnectionHandler extends Thread {
         } catch (Exception e) {
             e.printStackTrace();
         }
+        this.multiplayer = new Multiplayer(menu);
     }
 
     @Override
@@ -39,13 +43,13 @@ public class MenuConnectionHandler extends Thread {
                 incomingConnection.close();
                 switch (message[0]) {
                     case "C":
-                        menu.onOpponentChallenge(message[1], opponentAddress);
+                        multiplayer.onOpponentChallenge(message[1], opponentAddress);
                         break;
                     case "A":
-                        menu.onChallengeAccepted(message[1].equals("B") ? Cell.Colour.black : Cell.Colour.white, opponentAddress, message[2]);
+                        multiplayer.onChallengeAccepted(message[1].equals("B") ? Cell.Colour.black : Cell.Colour.white, opponentAddress, message[2]);
                         break;
                     case "D":
-                        menu.onChallengeDeclined();
+                        multiplayer.onChallengeDeclined();
                         break;
                 }
             } catch (SocketTimeoutException ignored) {
@@ -66,8 +70,11 @@ public class MenuConnectionHandler extends Thread {
         }
     }
 
-    public void challenge(String myName, String opponentAddress) {
+    public void challenge(String myName, String opponentAddress, JFrame gameParametersWindow, GameAttributes gameAttributes, JLabel spacerLabel) {
         sendMessage(opponentAddress, "C " + myName);
+        multiplayer.setGameParametersWindow(gameParametersWindow);
+        multiplayer.setGameAttributes(gameAttributes);
+        multiplayer.setSpacerLabel(spacerLabel);
     }
 
     public void accept(String opponentAddress, Cell.Colour colour, String myName) {
