@@ -21,6 +21,13 @@ public class Multiplayer {
         this.spacerLabel = new JLabel("");
     }
 
+    public Multiplayer(Menu menu, GameAttributes gameAttributes) {
+        this.menu = menu;
+        this.gameAttributes = gameAttributes;
+        this.spacerLabel = gameAttributes.getSpacerLabel();
+        this.gameParametersWindow = gameAttributes.getGameParametersWindow();
+    }
+
     public void onOpponentChallenge(String opponentName, String opponentAddress) {
         final JFrame challengeWindow = new JFrame("Challenge Window");
         challengeWindow.setSize(new Dimension(500, 120));
@@ -74,17 +81,5 @@ public class Multiplayer {
 
     public void onChallengeDeclined() {
         spacerLabel.setText("Declined!");
-    }
-
-    public void setGameParametersWindow(JFrame gameParametersWindow) {
-        this.gameParametersWindow = gameParametersWindow;
-    }
-
-    public void setGameAttributes(GameAttributes gameAttributes) {
-        this.gameAttributes = gameAttributes;
-    }
-
-    public void setSpacerLabel(JLabel spacerLabel) {
-        this.spacerLabel = spacerLabel;
     }
 }

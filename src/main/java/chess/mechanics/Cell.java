@@ -38,7 +38,7 @@ public class Cell extends JComponent {
     }
 
     public void setPiece(String pieceType, Cell.Colour pieceColour) {
-        switch(pieceType) {
+        switch (pieceType) {
             case "Pawn":
                 this.piece = new Pawn(pieceColour);
                 break;

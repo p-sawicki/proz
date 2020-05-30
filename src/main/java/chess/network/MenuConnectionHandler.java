@@ -4,7 +4,6 @@ import chess.gui.Menu;
 import chess.mechanics.Cell;
 import chess.utilities.GameAttributes;
 
-import javax.swing.*;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
@@ -70,11 +69,9 @@ public class MenuConnectionHandler extends Thread {
         }
     }
 
-    public void challenge(String myName, String opponentAddress, JFrame gameParametersWindow, GameAttributes gameAttributes, JLabel spacerLabel) {
+    public void challenge(String myName, String opponentAddress, GameAttributes gameAttributes) {
         sendMessage(opponentAddress, "C " + myName);
-        multiplayer.setGameParametersWindow(gameParametersWindow);
-        multiplayer.setGameAttributes(gameAttributes);
-        multiplayer.setSpacerLabel(spacerLabel);
+        this.multiplayer = new Multiplayer(this.menu, gameAttributes);
     }
 
     public void accept(String opponentAddress, Cell.Colour colour, String myName) {

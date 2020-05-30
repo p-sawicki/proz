@@ -253,10 +253,9 @@ public class Board extends JPanel implements MouseListener {
         Cell clicked = (Cell) getComponentAt(new Point(e.getX(), e.getY()));
         Point clickedPosition = clicked.getPosition();
         boolean isMoved = false, isMoved2 = false;
-        System.out.println("Mouse clicked on the component " + clicked.getPieceNameColor());
         int posX = clickedPosition.x;
         int posY = clickedPosition.y;
-        System.out.println("posX = " + posX + ", posY = " + posY);
+        System.out.println("Mouse clicked on the component " + clicked.getPieceNameColor() + " | posX = " + posX + ", posY = " + posY);
 
         if (clickedCellPosition.equals(nullPosition)) { //player hasn't chosen cell to move yet
             if (clicked.getOccupation()) {

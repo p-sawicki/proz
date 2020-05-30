@@ -12,13 +12,11 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 //import java.time.LocalDateTime;
 
-
 public class GameWindow {
     private JFrame window;
     private Board board;
     private String playerName;
     private String opponentName;
-    private String opponentIP;
     private ConnectionHandler connectionHandler;
 
     public GameWindow(GameAttributes gameAttributes) {
@@ -26,7 +24,7 @@ public class GameWindow {
         window.setLayout(new BorderLayout(10, 10));
 
         this.connectionHandler = gameAttributes.getConnectionHandler();
-        if(connectionHandler != null)
+        if (connectionHandler != null)
             connectionHandler.setGameWindow(window);
 
         if (gameAttributes.getBoard() != null) {
@@ -71,8 +69,6 @@ public class GameWindow {
 
         // buttons' listeners
         goBackToMenuButton.addActionListener(e -> {
-            // if at least 1 move was made, ask player if he wants to exit a game without save
-            // if he is playing with another player then notify another player
             if (!checkIfSaveIsPossible() || Utility.ignoredWarning("Do you want to exit game without saving?")) {
                 quitProcedure();
                 SwingUtilities.invokeLater(new Menu());
@@ -90,7 +86,7 @@ public class GameWindow {
         // Menu bar in game
         JMenuBar menuBar = new JMenuBar();
         menuBar.add(goBackToMenuButton);
-        if(isSinglePlayer())
+        if (isSinglePlayer())
             menuBar.add(saveGameButton);
         menuBar.add(quitGameButton);
         menuBar.add(playerNameLabel);
@@ -118,10 +114,6 @@ public class GameWindow {
         return opponentName;
     }
 
-    public String getOpponentIP() {
-        return this.opponentIP;
-    }
-
     // setters
     public void setPlayerName(String playerName) {
         this.playerName = playerName;
@@ -131,17 +123,11 @@ public class GameWindow {
         this.opponentName = opponentName;
     }
 
-    public void setOpponentIP(String opponentIP) {
-        this.opponentIP = opponentIP;
-    }
-
     public void quitProcedure() {
-        if(!isSinglePlayer() && connectionHandler != null) {
-                Message message = new Message("Q");
-                connectionHandler.send(message);
-                connectionHandler.stopReceiving();
+        if (!isSinglePlayer() && connectionHandler != null) {
+            Message message = new Message("Q");
+            connectionHandler.send(message);
+            connectionHandler.stopReceiving();
         }
     }
-
-
 }

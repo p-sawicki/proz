@@ -56,10 +56,9 @@ public class ActionOpen implements ActionListener {
 
         String savedXmlGame = "";
         try {
-            savedXmlGame = new String (Files.readAllBytes(Paths.get(fileName)));
+            savedXmlGame = new String(Files.readAllBytes(Paths.get(fileName)));
             //System.out.println( savedXmlGame );
-        }
-        catch (IOException e) {
+        } catch (IOException e) {
             e.printStackTrace();
         }
 
@@ -88,6 +87,4 @@ public class ActionOpen implements ActionListener {
             menu.getMenuWindow().dispose();
         });
     }
-
-
 }
