@@ -42,7 +42,7 @@ public class SavedGame {
 
         for (int y = size - 1; y >= 0; --y) {
             for (int x = 0; x < size; ++x) {
-                int cellListIndex = x + (7 - y)*8;
+                int cellListIndex = x + (7 - y) * size;
                 SavedCell savedCell = cellsList.get(cellListIndex);
                 Cell cell = savedCell.createCell();
                 cells[y][x] = cell;

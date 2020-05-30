@@ -2,22 +2,19 @@ package chess.actions;
 
 import chess.gui.GameWindow;
 import chess.gui.Menu;
-import chess.utilities.GameAttributes;
+import chess.utilities.*;
 
 import javax.swing.*;
-import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 public class ActionNewGame implements ActionListener {
     private Menu menu;
     private GameAttributes gameAttributes;
-    private JLabel spacerLabel;
 
     public ActionNewGame(Menu menu) {
         this.menu = menu;
         this.gameAttributes = new GameAttributes();
-        this.spacerLabel = new JLabel("");
     }
 
     @Override
@@ -27,7 +24,7 @@ public class ActionNewGame implements ActionListener {
 
     private void setGameType() {
         // window parameters
-        JFrame gameParametersWindow = createGameParametersWindow(3,1);
+        JFrame gameParametersWindow = Utility.createGameParametersWindow(3, 1);
 
         // window objects
         JLabel enterNameLabel = new JLabel("  Please select game type:");
@@ -52,14 +49,14 @@ public class ActionNewGame implements ActionListener {
     }
 
     public void startNewGame(boolean singlePlayer) { // asks for player name, opponent IP
-        JFrame gameParametersWindow = createGameParametersWindow(3, 2);
+        JFrame gameParametersWindow = Utility.createGameParametersWindow(3, 2);
 
         // window objects
         JLabel enterNameLabel = new JLabel("  Please enter your name:");
         JTextField nameField = new JTextField();
         JLabel enterIPLabel = new JLabel("  Please enter opponent IP:");
         JTextField ipField = new JTextField();
-        spacerLabel = new JLabel("");
+        JLabel spacerLabel = new JLabel("");
         JButton startButton = new JButton("Start");
 
         gameParametersWindow.add(enterNameLabel);
@@ -90,21 +87,13 @@ public class ActionNewGame implements ActionListener {
                 menu.getMenuConnectionHandler().stopReceiving();
                 new GameWindow(gameAttributes);
                 menu.getMenuWindow().dispose();
+                gameParametersWindow.dispose();
             } else {
                 spacerLabel.setText("Waiting...");
-                menu.getMenuConnectionHandler().challenge(playerName, opponentIP, gameParametersWindow, gameAttributes, spacerLabel);
+                gameAttributes.setGameParametersWindow(gameParametersWindow);
+                gameAttributes.setSpacerLabel(spacerLabel);
+                menu.getMenuConnectionHandler().challenge(playerName, opponentIP, gameAttributes);
             }
         });
-    }
-
-    public JFrame createGameParametersWindow(int rows, int columns) {
-        JFrame gameParametersWindow = new JFrame("Game Parameters");
-
-        // window parameters
-        gameParametersWindow.setSize(new Dimension(400, 100));
-        gameParametersWindow.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-        gameParametersWindow.setVisible(true);
-        gameParametersWindow.setLayout(new GridLayout(rows, columns));
-        return gameParametersWindow;
     }
 }

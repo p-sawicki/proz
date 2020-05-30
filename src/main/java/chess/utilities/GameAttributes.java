@@ -3,6 +3,8 @@ package chess.utilities;
 import chess.mechanics.*;
 import chess.network.ConnectionHandler;
 
+import javax.swing.*;
+
 public class GameAttributes {
     private Board board;
     private boolean singlePlayer;
@@ -11,6 +13,9 @@ public class GameAttributes {
     private String opponentName;
     private String opponentIP;
     private ConnectionHandler connectionHandler;
+
+    private JFrame gameParametersWindow;
+    private JLabel spacerLabel;
 
     // getters
     public Board getBoard() {
@@ -41,6 +46,14 @@ public class GameAttributes {
         return this.connectionHandler;
     }
 
+    public JFrame getGameParametersWindow() {
+        return gameParametersWindow;
+    }
+
+    public JLabel getSpacerLabel() {
+        return spacerLabel;
+    }
+
     // setters
     public void setBoard(Board board) {
         this.board = board;
@@ -68,5 +81,13 @@ public class GameAttributes {
 
     public void setConnectionHandler(ConnectionHandler connHandler) {
         this.connectionHandler = connHandler;
+    }
+
+    public void setGameParametersWindow(JFrame gameParametersWindow) {
+        this.gameParametersWindow = gameParametersWindow;
+    }
+
+    public void setSpacerLabel(JLabel spacerLabel) {
+        this.spacerLabel = spacerLabel;
     }
 }

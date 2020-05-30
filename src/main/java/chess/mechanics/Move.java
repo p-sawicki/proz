@@ -2,7 +2,6 @@ package chess.mechanics;
 
 import java.awt.*;
 import java.io.Serializable;
-import java.util.HashMap;
 
 public class Move implements Serializable {
     public Point before;
