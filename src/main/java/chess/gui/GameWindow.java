@@ -1,3 +1,10 @@
+package chess.gui;
+
+import chess.actions.*;
+import chess.network.*;
+import chess.mechanics.*;
+import chess.utilities.*;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.WindowAdapter;

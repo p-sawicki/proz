@@ -1,7 +1,11 @@
+package chess.mechanics;
+
+import chess.mechanics.pieces.*;
+
 import java.util.ArrayList;
 
 public class CheckDetector {
-    enum State {none, check, checkmate}
+    public enum State {none, check, checkmate}
 
     public static State isOpponentChecked(Board board, Cell.Colour playerColour) {
         Cell[][] cells = board.getCells();

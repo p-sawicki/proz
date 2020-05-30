@@ -1,3 +1,8 @@
+package chess.utilities;
+
+import chess.gui.GameWindow;
+import chess.mechanics.*;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -10,7 +15,7 @@ public class SavedGame {
 
     //public enum GameStatus {x, checkmate}
 
-    SavedGame(GameWindow gameWindow) {
+    public SavedGame(GameWindow gameWindow) {
         Board board = gameWindow.getBoard();
         this.cellsList = new ArrayList<SavedCell>();
 

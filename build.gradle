@@ -21,7 +21,7 @@ java {
     targetCompatibility = JavaVersion.VERSION_1_8
 }
 
-mainClassName = 'Game'
+mainClassName = 'chess.Game'
 
 jar{
     manifest{

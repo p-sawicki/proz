@@ -1,3 +1,7 @@
+package chess;
+
+import chess.gui.Menu;
+
 import javax.swing.*;
 
 public class Game implements Runnable {

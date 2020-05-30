@@ -1,3 +1,7 @@
+package chess.utilities;
+
+import chess.mechanics.*;
+
 import java.awt.*;
 
 public class SavedCell {

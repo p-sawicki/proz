@@ -1,3 +1,8 @@
+package chess.network;
+
+import chess.gui.Menu;
+import chess.mechanics.Cell;
+
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
@@ -11,7 +16,7 @@ public class MenuConnectionHandler extends Thread {
     private boolean running;
     private ServerSocket serverSocket;
 
-    MenuConnectionHandler(Menu menu) {
+    public MenuConnectionHandler(Menu menu) {
         this.menu = menu;
         running = false;
         try {

@@ -1,23 +1,28 @@
+package chess.mechanics.pieces;
+
+import chess.mechanics.*;
+
 import java.util.ArrayList;
 
-public class Rook extends Piece {
-    public Rook(Cell.Colour colour) {
+public class Queen extends Piece {
+    public Queen(Cell.Colour colour) {
         super(colour);
     }
 
     public Piece copy() {
-        return new Rook(colour);
+        return new Queen(colour);
     }
 
     @Override
     public String getName() {
-        return "Rook";
+        return "Queen";
     }
 
     protected ArrayList<Move> getPossibleMoves() {
         ArrayList<Move> moves = new ArrayList<>();
-        moves.addAll(getVerticalMoves());
         moves.addAll(getHorizontalMoves());
+        moves.addAll(getVerticalMoves());
+        moves.addAll(getDiagonalMoves());
         return moves;
     }
 }

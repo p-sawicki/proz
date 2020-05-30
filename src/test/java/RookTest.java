@@ -1,3 +1,5 @@
+import chess.mechanics.Board;
+import chess.mechanics.pieces.Rook;
 import junit.framework.TestCase;
 
 public class RookTest extends TestCase {

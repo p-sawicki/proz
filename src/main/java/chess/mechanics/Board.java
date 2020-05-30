@@ -1,6 +1,12 @@
+package chess.mechanics;
+
+import chess.network.*;
+import chess.mechanics.pieces.*;
+
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.*;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 
 public class Board extends JPanel implements MouseListener {
     private final int size = 8;

@@ -1,3 +1,7 @@
+package chess.mechanics;
+
+import chess.utilities.*;
+
 import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.image.BufferedImage;
@@ -128,7 +132,7 @@ public abstract class Piece {
         return new File(Utility.getResourcePath() + getColourAsString() + getName() + ".png");
     }
 
-    protected String getColourAsString() {
+    public String getColourAsString() {
         return colour == Cell.Colour.black ? "Black" : "White";
     }
 

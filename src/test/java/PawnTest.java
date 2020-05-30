@@ -1,3 +1,4 @@
+import chess.mechanics.Board;
 import junit.framework.TestCase;
 
 public class PawnTest extends TestCase {
