@@ -1,3 +1,6 @@
+import chess.mechanics.*;
+import chess.mechanics.pieces.King;
+
 import junit.framework.TestCase;
 
 public class KingTest extends TestCase {

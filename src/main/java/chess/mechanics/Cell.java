@@ -1,3 +1,7 @@
+package chess.mechanics;
+
+import chess.mechanics.pieces.*;
+
 import javax.swing.*;
 import java.awt.*;
 

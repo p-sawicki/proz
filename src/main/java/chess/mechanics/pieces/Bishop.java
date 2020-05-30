@@ -1,3 +1,7 @@
+package chess.mechanics.pieces;
+
+import chess.mechanics.*;
+
 import java.util.ArrayList;
 
 public class Bishop extends Piece {

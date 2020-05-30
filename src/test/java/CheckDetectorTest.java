@@ -1,3 +1,6 @@
+import chess.mechanics.*;
+import chess.mechanics.pieces.*;
+
 import junit.framework.TestCase;
 
 public class CheckDetectorTest extends TestCase {

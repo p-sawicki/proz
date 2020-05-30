@@ -1,3 +1,7 @@
+package chess.actions;
+
+import chess.gui.GameWindow;
+import chess.utilities.SavedGame;
 import com.thoughtworks.xstream.XStream;
 
 import javax.swing.*;

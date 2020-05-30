@@ -1,3 +1,6 @@
+import chess.mechanics.*;
+import chess.mechanics.pieces.*;
+
 public class BoardSetup {
     public static Board getEmptyBoard(Cell.Colour playerColour){
         Board board = new Board(playerColour);

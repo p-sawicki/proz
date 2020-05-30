@@ -1,3 +1,10 @@
+package chess.gui;
+
+import chess.network.*;
+import chess.utilities.*;
+import chess.actions.*;
+import chess.mechanics.*;
+
 import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
@@ -13,7 +20,6 @@ public class Menu implements Runnable {
     private final MenuConnectionHandler menuConnectionHandler;
     private JFrame menuWindow;
     private JLabel spacerLabel;
-    private JFrame gameParametersWindow;
     private GameAttributes gameAttributes;
 
     public Menu() {
@@ -88,11 +94,7 @@ public class Menu implements Runnable {
 
     private void setGameType() {
         // window parameters
-        gameParametersWindow = new JFrame("Game Type");
-        gameParametersWindow.setSize(new Dimension(400, 100));
-        gameParametersWindow.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        gameParametersWindow.setVisible(true);
-        gameParametersWindow.setLayout(new GridLayout(3, 1));
+        JFrame gameParametersWindow = createGameParametersWindow(3,1);
 
         // window objects
         JLabel enterNameLabel = new JLabel("  Please select game type:");
@@ -107,15 +109,17 @@ public class Menu implements Runnable {
         singlePlayerButton.addActionListener(e -> {
             gameAttributes.setSinglePlayer(true);
             startNewGame(true);
+            gameParametersWindow.dispose();
         });
         multiPlayerButton.addActionListener(e -> {
             gameAttributes.setSinglePlayer(false);
             startNewGame(false);
+            gameParametersWindow.dispose();
         });
     }
 
     public void startNewGame(boolean singlePlayer) { // asks for player name, opponent IP
-        createGameParametersWindow(3);
+        JFrame gameParametersWindow = createGameParametersWindow(3, 2);
 
         // window objects
         JLabel enterNameLabel = new JLabel("  Please enter your name:");
@@ -156,11 +160,12 @@ public class Menu implements Runnable {
                 spacerLabel.setText("Waiting...");
                 menuConnectionHandler.challenge(playerName, opponentIP);
             }
+            gameParametersWindow.dispose();
         });
     }
 
     public void resumeSavedGame(GameAttributes savedGameAttributes) { // resumes saved game
-        createGameParametersWindow(2);
+        JFrame gameParametersWindow = createGameParametersWindow(2, 2);
 
         // window objects
         JLabel enterNameLabel = new JLabel("  Your name:");
@@ -193,7 +198,7 @@ public class Menu implements Runnable {
 
     public void onOpponentChallenge(String opponentName, String opponentAddress) {
         final JFrame challengeWindow = new JFrame("Challenge Window");
-        challengeWindow.setSize(new Dimension(400, 300));
+        challengeWindow.setSize(new Dimension(500, 100));
         challengeWindow.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         challengeWindow.setVisible(true);
         challengeWindow.setLayout(new GridLayout(2, 2));
@@ -231,7 +236,6 @@ public class Menu implements Runnable {
         gameAttributes.setConnectionHandler(new ConnectionHandler(opponentAddress, null));
         new GameWindow(this.gameAttributes);
         menuConnectionHandler.stopReceiving();
-        gameParametersWindow.dispose();
     }
 
     public void onChallengeDeclined() {
@@ -239,7 +243,7 @@ public class Menu implements Runnable {
     }
 
     public void enterPlayerName() {
-        createGameParametersWindow(2);
+        JFrame gameParametersWindow = createGameParametersWindow(2, 2);
 
         // window objects
         JLabel enterNameLabel = new JLabel("  Please enter your name:");
@@ -268,13 +272,14 @@ public class Menu implements Runnable {
         return menuWindow;
     }
 
-    public void createGameParametersWindow(int rows) {
-        gameParametersWindow = new JFrame("Game Parameters");
+    public JFrame createGameParametersWindow(int rows, int columns) {
+        JFrame gameParametersWindow = new JFrame("Game Parameters");
 
         // window parameters
         gameParametersWindow.setSize(new Dimension(400, 100));
         gameParametersWindow.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         gameParametersWindow.setVisible(true);
-        gameParametersWindow.setLayout(new GridLayout(rows, 2));
+        gameParametersWindow.setLayout(new GridLayout(rows, columns));
+        return gameParametersWindow;
     }
 }

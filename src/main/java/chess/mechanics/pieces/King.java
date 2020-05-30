@@ -1,3 +1,7 @@
+package chess.mechanics.pieces;
+
+import chess.mechanics.*;
+
 import java.awt.Point;
 import java.util.ArrayList;
 

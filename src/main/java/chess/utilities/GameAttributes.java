@@ -1,3 +1,8 @@
+package chess.utilities;
+
+import chess.mechanics.*;
+import chess.network.*;
+
 public class GameAttributes {
     private Board board;
     private boolean singlePlayer;
