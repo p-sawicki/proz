@@ -298,7 +298,7 @@ public class Board extends JPanel implements MouseListener {
                 Cell.Colour playerColour = whiteTurn ? Cell.Colour.white : Cell.Colour.black;
                 Move move = new Move(cells[prevY][prevX].getPosition(), clicked.getPosition());
                 CheckDetector.State state = CheckDetector.isOpponentChecked(this, playerColour);
-                Message message = new Message(move, state);
+                Message message = new Message(move, state, "M");
                 if (connectionHandler != null) {
                     connectionHandler.send(message);
                     disableGame();

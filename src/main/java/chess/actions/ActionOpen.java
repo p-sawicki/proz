@@ -2,14 +2,14 @@ package chess.actions;
 
 import chess.gui.GameWindow;
 import chess.gui.Menu;
-import chess.utilities.*;
-
+import chess.utilities.GameAttributes;
+import chess.utilities.SavedGame;
+import chess.utilities.Utility;
 import com.thoughtworks.xstream.XStream;
 
 import javax.swing.*;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.filechooser.FileSystemView;
-import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
@@ -67,7 +67,7 @@ public class ActionOpen implements ActionListener {
     }
 
     public void resumeSavedGame(GameAttributes savedGameAttributes) { // resumes saved game
-        JFrame gameParametersWindow = createGameParametersWindow(2, 2);
+        JFrame gameParametersWindow = Utility.createGameParametersWindow(2, 2);
 
         // window objects
         JLabel enterNameLabel = new JLabel("  Your name:");
@@ -89,14 +89,5 @@ public class ActionOpen implements ActionListener {
         });
     }
 
-    public JFrame createGameParametersWindow(int rows, int columns) {
-        JFrame gameParametersWindow = new JFrame("Game Parameters");
 
-        // window parameters
-        gameParametersWindow.setSize(new Dimension(400, 100));
-        gameParametersWindow.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-        gameParametersWindow.setVisible(true);
-        gameParametersWindow.setLayout(new GridLayout(rows, columns));
-        return gameParametersWindow;
-    }
 }

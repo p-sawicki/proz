@@ -3,7 +3,8 @@ package chess.gui;
 import chess.actions.ActionSaveAs;
 import chess.mechanics.Board;
 import chess.network.ConnectionHandler;
-import chess.utilities.GameAttributes;
+import chess.network.Message;
+import chess.utilities.*;
 
 import javax.swing.*;
 import java.awt.*;
@@ -25,6 +26,8 @@ public class GameWindow {
         window.setLayout(new BorderLayout(10, 10));
 
         this.connectionHandler = gameAttributes.getConnectionHandler();
+        if(connectionHandler != null)
+            connectionHandler.setGameWindow(window);
 
         if (gameAttributes.getBoard() != null) {
             this.board = gameAttributes.getBoard();
@@ -40,7 +43,8 @@ public class GameWindow {
         window.addWindowListener(new WindowAdapter() {
             @Override
             public void windowClosing(WindowEvent e) {
-                if (ignoredWarning("Do you want to exit game?")) {
+                if (Utility.ignoredWarning("Do you want to exit game?")) {
+                    quitProcedure();
                     System.exit(0);
                 }
             }
@@ -69,16 +73,16 @@ public class GameWindow {
         goBackToMenuButton.addActionListener(e -> {
             // if at least 1 move was made, ask player if he wants to exit a game without save
             // if he is playing with another player then notify another player
-            if (!checkIfSaveIsPossible() || ignoredWarning("Do you want to exit game without saving?")) {
+            if (!checkIfSaveIsPossible() || Utility.ignoredWarning("Do you want to exit game without saving?")) {
+                quitProcedure();
                 SwingUtilities.invokeLater(new Menu());
                 window.dispose();
-                if (connectionHandler != null)
-                    connectionHandler.stopReceiving();
             }
         });
         saveGameButton.addActionListener(new ActionSaveAs(this));
         quitGameButton.addActionListener(e -> {
-            if (!checkIfSaveIsPossible() || ignoredWarning("Do you want to exit game without saving?")) {
+            if (!checkIfSaveIsPossible() || Utility.ignoredWarning("Do you want to exit game without saving?")) {
+                quitProcedure();
                 System.exit(0);
             }
         });
@@ -91,22 +95,6 @@ public class GameWindow {
         menuBar.add(quitGameButton);
         menuBar.add(playerNameLabel);
         window.setJMenuBar(menuBar);
-    }
-
-    public JFrame createWarningWindow() {
-        final JFrame warningWindow = new JFrame("Warning");
-        warningWindow.setSize(new Dimension(300, 100));
-        warningWindow.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        warningWindow.setVisible(true);
-        return warningWindow;
-    }
-
-    public boolean ignoredWarning(String warningMessage) {
-        JFrame warningWindow = createWarningWindow();
-        boolean yesResponse = JOptionPane.showConfirmDialog(warningWindow, warningMessage) == JOptionPane.YES_OPTION;
-        warningWindow.setVisible(false);
-        warningWindow.dispose();
-        return yesResponse;
     }
 
     public boolean checkIfSaveIsPossible() {
@@ -146,4 +134,14 @@ public class GameWindow {
     public void setOpponentIP(String opponentIP) {
         this.opponentIP = opponentIP;
     }
+
+    public void quitProcedure() {
+        if(!isSinglePlayer() && connectionHandler != null) {
+                Message message = new Message("Q");
+                connectionHandler.send(message);
+                connectionHandler.stopReceiving();
+        }
+    }
+
+
 }
