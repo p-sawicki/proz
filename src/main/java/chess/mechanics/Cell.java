@@ -13,12 +13,9 @@ public class Cell extends JComponent {
 
     public enum Colour {white, black}
 
-    public Cell(Colour color, Board board, Point position) {
-        this.colour = color;
-        this.board = board;
-        this.position = position;
-
-        setBorder(BorderFactory.createEmptyBorder());
+    public Cell() {
+        this.colour = Cell.Colour.black;
+        this.position = new Point(-1, -1);
     }
 
     public Cell(Point position) {
@@ -26,9 +23,12 @@ public class Cell extends JComponent {
         this.position = position;
     }
 
-    public Cell() {
-        this.colour = Cell.Colour.black;
-        this.position = new Point(-1, -1);
+    public Cell(Colour color, Board board, Point position) {
+        this.colour = color;
+        this.board = board;
+        this.position = position;
+
+        setBorder(BorderFactory.createEmptyBorder());
     }
 
     public void setPiece(Piece piece) {
@@ -76,19 +76,6 @@ public class Cell extends JComponent {
         return this.getPiece() != null;
     }
 
-    public void paint(Graphics g) {
-        super.paintComponent(g);
-
-        if (colour == Colour.white)
-            g.setColor(new Color(221, 192, 127));
-        else
-            g.setColor(new Color(85, 76, 76));
-
-        g.fillRect(getX(), getY(), getWidth(), getHeight());
-        if (piece != null)
-            piece.draw(g);
-    }
-
     public String getPieceNameColor() {
         if (this.getPiece() != null)
             return this.getPiece().getColourAsString() + " " + this.getPiece().getName();
@@ -101,5 +88,18 @@ public class Cell extends JComponent {
 
     public Point getPosition() {
         return position;
+    }
+
+    public void paint(Graphics g) {
+        super.paintComponent(g);
+
+        if (colour == Colour.white)
+            g.setColor(new Color(221, 192, 127));
+        else
+            g.setColor(new Color(85, 76, 76));
+
+        g.fillRect(getX(), getY(), getWidth(), getHeight());
+        if (piece != null)
+            piece.draw(g);
     }
 }

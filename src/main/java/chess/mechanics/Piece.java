@@ -1,6 +1,6 @@
 package chess.mechanics;
 
-import chess.utilities.*;
+import chess.utilities.Utility;
 
 import javax.imageio.ImageIO;
 import java.awt.*;

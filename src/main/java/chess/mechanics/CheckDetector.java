@@ -1,6 +1,6 @@
 package chess.mechanics;
 
-import chess.mechanics.pieces.*;
+import chess.mechanics.pieces.King;
 
 import java.util.ArrayList;
 
