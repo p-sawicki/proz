@@ -1,7 +1,7 @@
 package chess.utilities;
 
 import chess.mechanics.*;
-import chess.network.*;
+import chess.network.ConnectionHandler;
 
 public class GameAttributes {
     private Board board;

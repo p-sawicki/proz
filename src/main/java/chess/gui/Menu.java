@@ -1,9 +1,9 @@
 package chess.gui;
 
+import chess.actions.ActionOpen;
+import chess.mechanics.Cell;
 import chess.network.*;
 import chess.utilities.*;
-import chess.actions.*;
-import chess.mechanics.*;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
@@ -60,7 +60,7 @@ public class Menu implements Runnable {
         // buttons' listeners
         newGameButton.addActionListener(e -> {
             setGameType();
-            window.dispose();
+            //window.dispose();
         });
         loadGameButton.addActionListener(new ActionOpen(this));
         aboutGameButton.addActionListener(e -> {
@@ -156,32 +156,12 @@ public class Menu implements Runnable {
             if (opponentIP == null) {
                 menuConnectionHandler.stopReceiving();
                 new GameWindow(gameAttributes);
+                menuWindow.dispose();
             } else {
                 spacerLabel.setText("Waiting...");
                 menuConnectionHandler.challenge(playerName, opponentIP);
             }
             gameParametersWindow.dispose();
-        });
-    }
-
-    public void resumeSavedGame(GameAttributes savedGameAttributes) { // resumes saved game
-        JFrame gameParametersWindow = createGameParametersWindow(2, 2);
-
-        // window objects
-        JLabel enterNameLabel = new JLabel("  Your name:");
-        JLabel nameField = new JLabel(savedGameAttributes.getPlayerName());
-        JLabel spacerLabel = new JLabel("");
-        JButton startButton = new JButton("Start");
-
-        gameParametersWindow.add(enterNameLabel);
-        gameParametersWindow.add(nameField);
-        gameParametersWindow.add(spacerLabel);
-        gameParametersWindow.add(startButton);
-
-        // button listener
-        startButton.addActionListener(e -> {
-                menuConnectionHandler.stopReceiving();
-                new GameWindow(savedGameAttributes);
         });
     }
 
@@ -203,7 +183,7 @@ public class Menu implements Runnable {
         challengeWindow.setVisible(true);
         challengeWindow.setLayout(new GridLayout(2, 2));
 
-        challengeWindow.add(new JLabel("You've been challenged to a game!"));
+        challengeWindow.add(new JLabel("  You've been challenged to a game!"));
         challengeWindow.add(new JLabel("Opponent name: " + opponentName + " IP: " + opponentAddress));
         JButton acceptButton = new JButton("Accept");
         JButton declineButton = new JButton("Decline");
@@ -272,12 +252,16 @@ public class Menu implements Runnable {
         return menuWindow;
     }
 
+    public MenuConnectionHandler getMenuConnectionHandler() {
+        return this.menuConnectionHandler;
+    }
+
     public JFrame createGameParametersWindow(int rows, int columns) {
         JFrame gameParametersWindow = new JFrame("Game Parameters");
 
         // window parameters
         gameParametersWindow.setSize(new Dimension(400, 100));
-        gameParametersWindow.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        gameParametersWindow.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         gameParametersWindow.setVisible(true);
         gameParametersWindow.setLayout(new GridLayout(rows, columns));
         return gameParametersWindow;

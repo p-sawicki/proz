@@ -1,8 +1,8 @@
 package chess.actions;
 
+import chess.gui.GameWindow;
 import chess.gui.Menu;
-import chess.utilities.GameAttributes;
-import chess.utilities.SavedGame;
+import chess.utilities.*;
 
 import com.thoughtworks.xstream.XStream;
 
@@ -25,12 +25,10 @@ public class ActionOpen implements ActionListener {
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        if (openSavedGame()) { // saved game successfully resumed
-            menu.getMenuWindow().dispose();
-        }
+        openSavedGame();
     }
 
-    private boolean openSavedGame() {
+    private void openSavedGame() {
         // fileChooser parameters
         JFileChooser jfc = new JFileChooser(FileSystemView.getFileSystemView().getHomeDirectory());
         jfc.setDialogTitle("Choose a saved game to resume: ");
@@ -48,14 +46,8 @@ public class ActionOpen implements ActionListener {
             SavedGame savedGame = createSavedGameFromXml(fileName);
 
             GameAttributes savedGameAttr = savedGame.createGameAttributes();
-            menu.resumeSavedGame(savedGameAttr);
+            resumeSavedGame(savedGameAttr);
         }
-
-        if (returnValue == JFileChooser.CANCEL_OPTION) {
-            return false; // player hasn't chosen saved game
-        }
-
-        return true;
     }
 
     public SavedGame createSavedGameFromXml(String fileName) {
@@ -71,5 +63,28 @@ public class ActionOpen implements ActionListener {
         }
 
         return (SavedGame) xstream.fromXML(savedXmlGame);
+    }
+
+    public void resumeSavedGame(GameAttributes savedGameAttributes) { // resumes saved game
+        JFrame gameParametersWindow = menu.createGameParametersWindow(2, 2);
+
+        // window objects
+        JLabel enterNameLabel = new JLabel("  Your name:");
+        JLabel nameField = new JLabel(savedGameAttributes.getPlayerName());
+        JLabel spacerLabel = new JLabel("");
+        JButton startButton = new JButton("Start");
+
+        gameParametersWindow.add(enterNameLabel);
+        gameParametersWindow.add(nameField);
+        gameParametersWindow.add(spacerLabel);
+        gameParametersWindow.add(startButton);
+
+        // button listener
+        startButton.addActionListener(e -> {
+            menu.getMenuConnectionHandler().stopReceiving();
+            new GameWindow(savedGameAttributes);
+            gameParametersWindow.dispose();
+            menu.getMenuWindow().dispose();
+        });
     }
 }

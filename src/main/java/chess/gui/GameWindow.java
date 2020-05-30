@@ -1,9 +1,9 @@
 package chess.gui;
 
-import chess.actions.*;
-import chess.network.*;
-import chess.mechanics.*;
-import chess.utilities.*;
+import chess.actions.ActionSaveAs;
+import chess.mechanics.Board;
+import chess.network.ConnectionHandler;
+import chess.utilities.GameAttributes;
 
 import javax.swing.*;
 import java.awt.*;

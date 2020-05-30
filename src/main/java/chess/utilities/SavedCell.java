@@ -5,7 +5,6 @@ import chess.mechanics.*;
 import java.awt.*;
 
 public class SavedCell {
-    //private Cell.Colour colour;
     private String pieceType;
     private Cell.Colour pieceColour;
     private Point position;
@@ -13,7 +12,6 @@ public class SavedCell {
     SavedCell(Cell cell) {
         Piece piece = cell.getPiece();
 
-        //colour = cell.getColour();
         position = cell.getPosition();
         if (piece != null) {
             pieceType = piece.getName();
