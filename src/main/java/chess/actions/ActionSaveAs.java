@@ -2,6 +2,7 @@ package chess.actions;
 
 import chess.gui.GameWindow;
 import chess.utilities.SavedGame;
+import chess.utilities.Utility;
 import com.thoughtworks.xstream.XStream;
 
 import javax.swing.*;
@@ -38,7 +39,7 @@ public class ActionSaveAs implements ActionListener {
         int returnValue = fileChooser.showSaveDialog(null);
         if (returnValue == JFileChooser.APPROVE_OPTION) {
             File selectedFile = fileChooser.getSelectedFile();
-            if (!selectedFile.exists() || gameWindow.ignoredWarning("Do you want to overwrite data in file?")) { // prevents overwriting existing file without player consent
+            if (!selectedFile.exists() || Utility.ignoredWarning("Do you want to overwrite data in file?")) { // prevents overwriting existing file without player consent
                 String fileName = getFileName(fileChooser);
                 saveXmlGame(fileName);
 
