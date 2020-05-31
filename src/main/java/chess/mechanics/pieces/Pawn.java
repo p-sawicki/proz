@@ -6,27 +6,22 @@ import java.awt.Point;
 import java.util.ArrayList;
 
 public class Pawn extends Piece {
-    private boolean doneFirstMove;
+    private boolean doubleStepLast;
 
     public Pawn(Cell.Colour colour) {
-        this(colour, false);
-    }
-
-    public Pawn(Cell.Colour colour, boolean doneFirstMove) {
         super(colour);
-        this.doneFirstMove = doneFirstMove;
     }
 
     public Piece copy() {
         return new Pawn(colour);
     }
 
-    public boolean isDoneFirstMove() {
-        return doneFirstMove;
+    public boolean isDoubleStepLast() {
+        return doubleStepLast;
     }
 
-    public void setDoneFirstMove(boolean doneFirstMove) {
-        this.doneFirstMove = doneFirstMove;
+    public void setDoubleStepLast(boolean doubleStepLast) {
+        this.doubleStepLast = doubleStepLast;
     }
 
     @Override
@@ -40,7 +35,7 @@ public class Pawn extends Piece {
         int y = start.y;
         int x = start.x;
         if (colour == Cell.Colour.black) {
-            if (y == 6 && cell.getBoard().getCells()[y - 2][x].getPiece() == null)
+            if (y == cell.getBoard().getBoardSize() - 2 && cell.getBoard().getCells()[y - 2][x].getPiece() == null)
                 moves.add(new Move(start, new Point(x, y - 2)));
             if (y - 1 >= 0) {
                 if (cell.getBoard().getCells()[y - 1][x].getPiece() == null)
@@ -49,11 +44,25 @@ public class Pawn extends Piece {
                     Piece piece = cell.getBoard().getCells()[y - 1][x - 1].getPiece();
                     if (piece != null && piece.getColour() != colour)
                         moves.add(new Move(start, new Point(x - 1, y - 1)));
+
+                    piece = cell.getBoard().getCells()[y][x - 1].getPiece();
+                    if(piece instanceof Pawn && piece.getColour() != colour && ((Pawn) piece).isDoubleStepLast()){
+                        Move move = new Move(start, new Point(x - 1, y - 1));
+                        move.secondMove = new Move(new Point(x - 1, y), null);
+                        moves.add(move);
+                    }
                 }
                 if (x + 1 < cell.getBoard().getBoardSize()) {
                     Piece piece = cell.getBoard().getCells()[y - 1][x + 1].getPiece();
                     if (piece != null && piece.getColour() != colour)
                         moves.add(new Move(start, new Point(x + 1, y - 1)));
+
+                    piece = cell.getBoard().getCells()[y][x + 1].getPiece();
+                    if(piece instanceof Pawn && piece.getColour() != colour && ((Pawn) piece).isDoubleStepLast()){
+                        Move move = new Move(start, new Point(x + 1, y - 1));
+                        move.secondMove = new Move(new Point(x + 1, y), null);
+                        moves.add(move);
+                    }
                 }
             }
         } else {
@@ -66,11 +75,25 @@ public class Pawn extends Piece {
                     Piece piece = cell.getBoard().getCells()[y + 1][x - 1].getPiece();
                     if (piece != null && piece.getColour() != colour)
                         moves.add(new Move(start, new Point(x - 1, y + 1)));
+
+                    piece = cell.getBoard().getCells()[y][x - 1].getPiece();
+                    if(piece instanceof Pawn && piece.getColour() != colour && ((Pawn) piece).isDoubleStepLast()){
+                        Move move = new Move(start, new Point(x - 1, y + 1));
+                        move.secondMove = new Move(new Point(x - 1, y), null);
+                        moves.add(move);
+                    }
                 }
                 if (x + 1 < cell.getBoard().getBoardSize()) {
                     Piece piece = cell.getBoard().getCells()[y + 1][x + 1].getPiece();
                     if (piece != null && piece.getColour() != colour)
                         moves.add(new Move(start, new Point(x + 1, y + 1)));
+
+                    piece = cell.getBoard().getCells()[y][x + 1].getPiece();
+                    if(piece instanceof Pawn && piece.getColour() != colour && ((Pawn) piece).isDoubleStepLast()){
+                        Move move = new Move(start, new Point(x + 1, y + 1));
+                        move.secondMove = new Move(new Point(x + 1, y), null);
+                        moves.add(move);
+                    }
                 }
             }
         }
