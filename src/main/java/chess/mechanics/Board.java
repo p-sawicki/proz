@@ -291,13 +291,13 @@ public class Board extends JPanel implements MouseListener {
             if (isMoved || isMoved2) {
                 repaint();
                 System.out.println("One of the components was moved");
-                switchTurn();
                 setBoardAltered(true); // sets board status as altered
                 clearMoves();
                 Cell.Colour playerColour = whiteTurn ? Cell.Colour.white : Cell.Colour.black;
                 Move move = new Move(cells[prevY][prevX].getPosition(), clicked.getPosition());
                 CheckDetector.State state = CheckDetector.isOpponentChecked(this, playerColour);
                 Message message = new Message(move, state, "M");
+                switchTurn();
                 if (connectionHandler != null) {
                     connectionHandler.send(message);
                     disableGame();
