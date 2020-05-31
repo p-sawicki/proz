@@ -23,6 +23,6 @@ public class Queen extends Piece {
         moves.addAll(getHorizontalMoves());
         moves.addAll(getVerticalMoves());
         moves.addAll(getDiagonalMoves());
-        return moves;
+        return removeMovesThatLeadToCheck(moves);
     }
 }
