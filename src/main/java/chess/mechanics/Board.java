@@ -71,8 +71,8 @@ public class Board extends JPanel implements MouseListener {
                     add(cell);
 
                     cell.setPiece(pieces[y][x]);
-                    if(cell.getPiece() instanceof King){
-                        if(cell.getPiece().colour == Cell.Colour.white)
+                    if (cell.getPiece() instanceof King) {
+                        if (cell.getPiece().colour == Cell.Colour.white)
                             whiteKing = (King) cell.getPiece();
                         else
                             blackKing = (King) cell.getPiece();
@@ -91,8 +91,8 @@ public class Board extends JPanel implements MouseListener {
                     add(cell);
 
                     cell.setPiece(pieces[y][x]);
-                    if(cell.getPiece() instanceof King){
-                        if(cell.getPiece().colour == Cell.Colour.white)
+                    if (cell.getPiece() instanceof King) {
+                        if (cell.getPiece().colour == Cell.Colour.white)
                             whiteKing = (King) cell.getPiece();
                         else
                             blackKing = (King) cell.getPiece();
@@ -137,8 +137,8 @@ public class Board extends JPanel implements MouseListener {
                 Piece piece = board.getCells()[y][x].getPiece();
                 if (piece != null) {
                     this.cells[y][x].setPiece(piece.copy());
-                    if(piece instanceof King){
-                        if(piece.colour == Cell.Colour.white)
+                    if (piece instanceof King) {
+                        if (piece.colour == Cell.Colour.white)
                             whiteKing = (King) piece;
                         else
                             blackKing = (King) piece;
@@ -191,7 +191,7 @@ public class Board extends JPanel implements MouseListener {
         return whiteTurn;
     }
 
-    public King getKing(Cell.Colour colour){
+    public King getKing(Cell.Colour colour) {
         return colour == Cell.Colour.white ? whiteKing : blackKing;
     }
 
@@ -238,7 +238,7 @@ public class Board extends JPanel implements MouseListener {
         }
     }
 
-    public ArrayList<Move> getMovesOfSelectedPiece(){
+    public ArrayList<Move> getMovesOfSelectedPiece() {
         return movesOfSelectedPiece;
     }
 
@@ -255,24 +255,21 @@ public class Board extends JPanel implements MouseListener {
         this.connectionHandler = connectionHandler;
     }
 
-    public boolean moveIfPossible(Cell start, Cell destination) { // moves piece if not contradicted by rules
-        System.out.println("moveIfPossible function called for element " + start.getPieceNameColor()
-                + " from cell X:" + start.getPosition().x + ", Y:" + start.getPosition().y
-                + " to cell X:" + destination.getPosition().x + ", Y:" + destination.getPosition().y);
-        if (!start.getOccupation()) {
-            System.out.println("start cell not occupied, position: " + start.getPosition().toString());
+    public boolean moveIfPossible(Move move) { // moves piece if not contradicted by rules
+        if (move == null)
             return false;
+        Piece movedPiece = cells[move.before.y][move.before.x].getPiece();
+        cells[move.before.y][move.before.x].removePiece();
+        cells[move.after.y][move.after.x].setPiece(movedPiece);
+        if(move.secondMove != null){
+            Piece secondMovedPiece = cells[move.secondMove.before.y][move.secondMove.before.x].getPiece();
+            cells[move.secondMove.before.y][move.secondMove.before.x].removePiece();
+            cells[move.secondMove.after.y][move.secondMove.after.x].setPiece(secondMovedPiece);
+            secondMovedPiece.hasMoved();
         }
-
-        boolean movable = start.getPiece().isAppropriateMove(destination);
-        if (movable) {
-            Piece movedPiece = start.getPiece();
-            start.removePiece();
-            destination.setPiece(movedPiece);
-            repaint();
-            return true;
-        }
-        return false;
+        repaint();
+        movedPiece.hasMoved();
+        return true;
     }
 
     //@Override
@@ -281,6 +278,7 @@ public class Board extends JPanel implements MouseListener {
         if (!enableGame) // disables moves if there was a checkmate
             return;
         Cell clicked = (Cell) getComponentAt(new Point(e.getX(), e.getY()));
+        Move move = null;
         Point clickedPosition = clicked.getPosition();
         boolean isMoved = false, isMoved2 = false;
         int posX = clickedPosition.x;
@@ -294,24 +292,32 @@ public class Board extends JPanel implements MouseListener {
                         || clicked.getPiece().getColourAsString().equals("Black") && !whiteTurn) {
                     this.clickedCellPosition = clickedPosition;
                     movesOfSelectedPiece = clicked.getPiece().getPossibleMoves();
+                    move = null;
                     repaint();
                 }
             }
         } else { // player clicked mouse when some cell is chosen
             int prevX = clickedCellPosition.x;
             int prevY = clickedCellPosition.y;
+            Piece piece = cells[prevY][prevX].getPiece();
+            for (Move possibleMove : piece.getPossibleMoves()) {
+                if (possibleMove.after.y == clicked.getPosition().y && possibleMove.after.x == clicked.getPosition().x) {
+                    move = possibleMove;
+                    break;
+                }
+            }
 
             if (!clicked.getOccupation()) {
                 System.out.println("Mouse clicked to move component to vacant cell");
 
-                isMoved = moveIfPossible(cells[prevY][prevX], clicked); //movePiece from clickedCell to clicked
+                isMoved = moveIfPossible(move); //movePiece from clickedCell to clicked
                 this.clickedCellPosition = nullPosition;
             }
             if (clicked.getOccupation()) {
                 if (clicked.getPiece().getColourAsString().equals("White") && !whiteTurn
                         || clicked.getPiece().getColourAsString().equals("Black") && whiteTurn) {
                     System.out.println("Mouse clicked to beat component");
-                    isMoved2 = moveIfPossible(cells[prevY][prevX], clicked); //beat clicked with clickedCell
+                    isMoved2 = moveIfPossible(move); //beat clicked with clickedCell
                     this.clickedCellPosition = nullPosition;
                 }
                 if (clicked.getPiece().getColourAsString().equals("White") && whiteTurn
@@ -329,7 +335,6 @@ public class Board extends JPanel implements MouseListener {
                 setBoardAltered(true); // sets board status as altered
                 clearMoves();
                 Cell.Colour playerColour = whiteTurn ? Cell.Colour.white : Cell.Colour.black;
-                Move move = new Move(cells[prevY][prevX].getPosition(), clicked.getPosition());
                 CheckDetector.State state = CheckDetector.isOpponentChecked(this, playerColour);
                 Message message = new Message(move, state, "M");
                 switchTurn();

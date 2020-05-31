@@ -14,6 +14,7 @@ public abstract class Piece {
     protected Cell cell;
     protected BufferedImage image;
     protected ArrayList<Move> possibleMoves;
+    protected boolean hasMoved;
 
     public Piece(Cell.Colour colour) {
         this.colour = colour;
@@ -23,6 +24,7 @@ public abstract class Piece {
             System.out.println("Could not open image: " + e.getMessage());
         }
         possibleMoves = new ArrayList<>();
+        hasMoved = false;
     }
 
     public abstract Piece copy();
@@ -37,6 +39,10 @@ public abstract class Piece {
 
     public Cell getCell() {
         return cell;
+    }
+
+    public boolean getHasMoved(){
+        return hasMoved;
     }
 
     public void clearMoves() {
@@ -145,6 +151,10 @@ public abstract class Piece {
     }
 
     public abstract String getName();
+
+    public void hasMoved(){
+        hasMoved = true;
+    }
 
     public boolean isAppropriateMove(Cell destination) { //checks if piece selected by player can be moved to selected cell
         for (Move move : getMoves())
