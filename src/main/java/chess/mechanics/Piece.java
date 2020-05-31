@@ -52,7 +52,6 @@ public abstract class Piece {
                 if (x >= 0 && x < cell.getBoard().getBoardSize()) {
                     Piece piece = cell.getBoard().getCells()[y][x].getPiece();
                     if (piece == null || piece.getColour() != colour) {
-                        move.after = cell.getBoard().getCells()[y][x].getPosition();
                         possibleMoves.add(move);
                     }
                 }
@@ -140,7 +139,7 @@ public abstract class Piece {
 
     public boolean isAppropriateMove(Cell destination) { //checks if piece selected by player can be moved to selected cell
         for (Move move : getMoves())
-            if (move.after.x == destination.getPosition().x && move.after.y == destination.getPosition().y)
+            if (move.after.x == destination.getPosition().x && move.after.y == destination.getPosition().y && !CheckDetector.isPlayerChecked(cell.getBoard(), move))
                 return true;
         return false;
     }

@@ -23,6 +23,8 @@ public class Board extends JPanel implements MouseListener {
     private ConnectionHandler connectionHandler;
     private Point clickedCellPosition = new Point(-1, -1);
     private final Point nullPosition = new Point(-1, -1);
+    private King whiteKing;
+    private King blackKing;
 
     //starting board state
     private final Piece[][] pieces = {
@@ -67,6 +69,12 @@ public class Board extends JPanel implements MouseListener {
                     add(cell);
 
                     cell.setPiece(pieces[y][x]);
+                    if(cell.getPiece() instanceof King){
+                        if(cell.getPiece().colour == Cell.Colour.white)
+                            whiteKing = (King) cell.getPiece();
+                        else
+                            blackKing = (King) cell.getPiece();
+                    }
 
                     if (x != 0)
                         color = color == Cell.Colour.black ? Cell.Colour.white : Cell.Colour.black;
@@ -80,8 +88,13 @@ public class Board extends JPanel implements MouseListener {
                     cell.board = this;
                     add(cell);
 
-                    if (pieces[y][x] != null)
-                        cell.setPiece(pieces[y][x]);
+                    cell.setPiece(pieces[y][x]);
+                    if(cell.getPiece() instanceof King){
+                        if(cell.getPiece().colour == Cell.Colour.white)
+                            whiteKing = (King) cell.getPiece();
+                        else
+                            blackKing = (King) cell.getPiece();
+                    }
 
                     if (x != size - 1)
                         color = color == Cell.Colour.black ? Cell.Colour.white : Cell.Colour.black;
@@ -120,8 +133,15 @@ public class Board extends JPanel implements MouseListener {
             for (int x = 0; x < size; ++x) {
                 this.cells[y][x] = new Cell(board.getCells()[y][x].getColour(), this, new Point(x, y));
                 Piece piece = board.getCells()[y][x].getPiece();
-                if (piece != null)
+                if (piece != null) {
                     this.cells[y][x].setPiece(piece.copy());
+                    if(piece instanceof King){
+                        if(piece.colour == Cell.Colour.white)
+                            whiteKing = (King) piece;
+                        else
+                            blackKing = (King) piece;
+                    }
+                }
             }
         }
     }
@@ -167,6 +187,10 @@ public class Board extends JPanel implements MouseListener {
 
     public boolean getWhiteTurn() {
         return whiteTurn;
+    }
+
+    public King getKing(Cell.Colour colour){
+        return colour == Cell.Colour.white ? whiteKing : blackKing;
     }
 
     public void switchTurn() {
