@@ -32,6 +32,23 @@ public class King extends Piece {
         moves.add(new Move(start, new Point(x - 1, y + 1)));
         moves.add(new Move(start, new Point(x, y + 1)));
         moves.add(new Move(start, new Point(x + 1, y + 1)));
+
+        Piece piece = cell.getBoard().getCells()[y][0].getPiece();
+        if (!hasMoved && piece instanceof Rook && piece.getColour() == colour && !piece.getHasMoved()
+                && !CheckDetector.isPlayerChecked(cell.getBoard(), new Move(start, start))
+                && !CheckDetector.isPlayerChecked(cell.getBoard(), new Move(start, new Point(x - 1, y)))) {
+            Move castle = new Move(start, new Point(x - 2, y));
+            castle.secondMove = new Move(piece.getCell().getPosition(), new Point(x - 1, y));
+            moves.add(castle);
+        }
+        piece = cell.getBoard().getCells()[y][cell.getBoard().getBoardSize() - 1].getPiece();
+        if (!hasMoved && piece instanceof Rook && piece.getColour() == Cell.Colour.white && !piece.getHasMoved()
+                && !CheckDetector.isPlayerChecked(cell.getBoard(), new Move(start, start))
+                && !CheckDetector.isPlayerChecked(cell.getBoard(), new Move(start, new Point(x + 1, y)))) {
+            Move castle = new Move(start, new Point(x + 2, y));
+            castle.secondMove = new Move(piece.getCell().getPosition(), new Point(x + 1, y));
+            moves.add(castle);
+        }
         return trimPossibleMoves(moves);
     }
 }
