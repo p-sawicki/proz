@@ -190,23 +190,5 @@ public class CheckDetector {
             }
         }
         return false;
-
-        /*board.clearMoves();
-        ArrayList<Move> opponentMoves = new ArrayList<>();
-        for (int y = 0; y < board.getBoardSize(); ++y) {
-            for (int x = 0; x < board.getBoardSize(); ++x) {
-                Piece piece = board.getCells()[y][x].getPiece();
-                if (piece != null && piece.getColour() != colour)
-                    opponentMoves.addAll(piece.getMoves());
-            }
-        }
-        for (Move move : opponentMoves) {
-            int y = move.after.y;
-            int x = move.after.x;
-            Piece piece = board.getCells()[y][x].getPiece();
-            if (piece instanceof King && piece.getColour() == colour)
-                return true;
-        }
-        return false;*/
     }
 }

@@ -261,12 +261,59 @@ public class Board extends JPanel implements MouseListener {
         Piece movedPiece = cells[move.before.y][move.before.x].getPiece();
         cells[move.before.y][move.before.x].removePiece();
         cells[move.after.y][move.after.x].setPiece(movedPiece);
-        if (movedPiece instanceof Pawn)
+        if (movedPiece instanceof Pawn) {
             ((Pawn) movedPiece).setDoubleStepLast(Math.abs(move.after.y - move.before.y) == 2);
+            if (move.after.y == 0 || move.after.y == size - 1) {
+                disableGame();
+                final JFrame promotionWindow = new JFrame("Promotion Window");
+                promotionWindow.setSize(new Dimension(500, 120));
+                promotionWindow.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
+                promotionWindow.setVisible(true);
+                promotionWindow.setLayout(new GridLayout(1, 4));
+
+                JButton queenButton = new JButton("Queen");
+                JButton rookButton = new JButton("Rook");
+                JButton knightButton = new JButton("Knight");
+                JButton bishopButton = new JButton("Bishop");
+
+                promotionWindow.add(queenButton);
+                promotionWindow.add(rookButton);
+                promotionWindow.add(knightButton);
+                promotionWindow.add(bishopButton);
+                queenButton.addActionListener(e -> {
+                    cells[move.after.y][move.after.x].setPiece(new Queen(movedPiece.getColour()));
+                    promotionWindow.dispose();
+                    enableGame = true;
+                    repaint();
+                    move.promotion = Move.Promotion.Queen;
+                });
+                rookButton.addActionListener(e -> {
+                    cells[move.after.y][move.after.x].setPiece(new Rook(movedPiece.getColour()));
+                    promotionWindow.dispose();
+                    enableGame = true;
+                    repaint();
+                    move.promotion = Move.Promotion.Rook;
+                });
+                knightButton.addActionListener(e -> {
+                    cells[move.after.y][move.after.x].setPiece(new Knight(movedPiece.getColour()));
+                    promotionWindow.dispose();
+                    enableGame = true;
+                    repaint();
+                    move.promotion = Move.Promotion.Knight;
+                });
+                bishopButton.addActionListener(e -> {
+                    cells[move.after.y][move.after.x].setPiece(new Bishop(movedPiece.getColour()));
+                    promotionWindow.dispose();
+                    enableGame = true;
+                    repaint();
+                    move.promotion = Move.Promotion.Bishop;
+                });
+            }
+        }
         if (move.secondMove != null) {
             Piece secondMovedPiece = cells[move.secondMove.before.y][move.secondMove.before.x].getPiece();
             cells[move.secondMove.before.y][move.secondMove.before.x].removePiece();
-            if(move.secondMove.after != null)
+            if (move.secondMove.after != null)
                 cells[move.secondMove.after.y][move.secondMove.after.x].setPiece(secondMovedPiece);
         }
         repaint();
@@ -383,8 +430,33 @@ public class Board extends JPanel implements MouseListener {
     }
 
     public void onMessageReceived(Message message) {
-        cells[message.move.after.y][message.move.after.x].setPiece(cells[message.move.before.y][message.move.before.x].getPiece());
+        Cell.Colour opponentColour = playerColour == Cell.Colour.white ? Cell.Colour.black : Cell.Colour.white;
+        if (message.move.promotion == null)
+            cells[message.move.after.y][message.move.after.x].setPiece(cells[message.move.before.y][message.move.before.x].getPiece());
+        else {
+            Piece newPiece = null;
+            switch (message.move.promotion) {
+                case Rook:
+                    newPiece = new Rook(opponentColour);
+                    break;
+                case Queen:
+                    newPiece = new Queen(opponentColour);
+                    break;
+                case Knight:
+                    newPiece = new Knight(opponentColour);
+                    break;
+                case Bishop:
+                    newPiece = new Bishop(opponentColour);
+            }
+            cells[message.move.after.y][message.move.after.x].setPiece(newPiece);
+        }
         cells[message.move.before.y][message.move.before.x].setPiece(null);
+        if (message.move.secondMove != null) {
+            if(message.move.secondMove.after != null)
+                cells[message.move.secondMove.after.y][message.move.secondMove.after.x].setPiece(
+                        cells[message.move.secondMove.before.y][message.move.secondMove.before.x].getPiece());
+            cells[message.move.secondMove.before.y][message.move.secondMove.before.x].setPiece(null);
+        }
         repaint();
         enableGame = true;
         whiteTurn = playerColour == Cell.Colour.white;
