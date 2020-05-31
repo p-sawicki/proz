@@ -261,11 +261,13 @@ public class Board extends JPanel implements MouseListener {
         Piece movedPiece = cells[move.before.y][move.before.x].getPiece();
         cells[move.before.y][move.before.x].removePiece();
         cells[move.after.y][move.after.x].setPiece(movedPiece);
-        if(move.secondMove != null){
+        if (movedPiece instanceof Pawn)
+            ((Pawn) movedPiece).setDoubleStepLast(Math.abs(move.after.y - move.before.y) == 2);
+        if (move.secondMove != null) {
             Piece secondMovedPiece = cells[move.secondMove.before.y][move.secondMove.before.x].getPiece();
             cells[move.secondMove.before.y][move.secondMove.before.x].removePiece();
-            cells[move.secondMove.after.y][move.secondMove.after.x].setPiece(secondMovedPiece);
-            secondMovedPiece.hasMoved();
+            if(move.secondMove.after != null)
+                cells[move.secondMove.after.y][move.secondMove.after.x].setPiece(secondMovedPiece);
         }
         repaint();
         movedPiece.hasMoved();
@@ -292,7 +294,6 @@ public class Board extends JPanel implements MouseListener {
                         || clicked.getPiece().getColourAsString().equals("Black") && !whiteTurn) {
                     this.clickedCellPosition = clickedPosition;
                     movesOfSelectedPiece = clicked.getPiece().getPossibleMoves();
-                    move = null;
                     repaint();
                 }
             }
