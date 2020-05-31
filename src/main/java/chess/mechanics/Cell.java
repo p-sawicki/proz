@@ -4,6 +4,7 @@ import chess.mechanics.pieces.*;
 
 import javax.swing.*;
 import java.awt.*;
+import java.util.ArrayList;
 
 public class Cell extends JComponent {
     private final Colour colour;
@@ -93,13 +94,28 @@ public class Cell extends JComponent {
     public void paint(Graphics g) {
         super.paintComponent(g);
 
-        if (colour == Colour.white)
-            g.setColor(new Color(221, 192, 127));
-        else
-            g.setColor(new Color(85, 76, 76));
+        if (isHighlighted())
+            g.setColor(new Color(25, 243, 124));
+        else {
+            if (colour == Colour.white)
+                g.setColor(new Color(221, 192, 127));
+            else
+                g.setColor(new Color(85, 76, 76));
+        }
 
         g.fillRect(getX(), getY(), getWidth(), getHeight());
         if (piece != null)
             piece.draw(g);
+    }
+
+    private boolean isHighlighted() {
+        ArrayList<Move> moves = board.getMovesOfSelectedPiece();
+        if (moves != null) {
+            for (Move move : moves) {
+                if (move.after.y == position.y && move.after.x == position.x)
+                    return true;
+            }
+        }
+        return false;
     }
 }

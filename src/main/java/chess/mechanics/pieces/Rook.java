@@ -22,6 +22,6 @@ public class Rook extends Piece {
         ArrayList<Move> moves = new ArrayList<>();
         moves.addAll(getVerticalMoves());
         moves.addAll(getHorizontalMoves());
-        return moves;
+        return removeMovesThatLeadToCheck(moves);
     }
 }

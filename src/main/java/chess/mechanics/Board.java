@@ -7,6 +7,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.util.ArrayList;
 
 public class Board extends JPanel implements MouseListener {
     private final int size = 8;
@@ -25,6 +26,7 @@ public class Board extends JPanel implements MouseListener {
     private final Point nullPosition = new Point(-1, -1);
     private King whiteKing;
     private King blackKing;
+    private ArrayList<Move> movesOfSelectedPiece;
 
     //starting board state
     private final Piece[][] pieces = {
@@ -236,6 +238,10 @@ public class Board extends JPanel implements MouseListener {
         }
     }
 
+    public ArrayList<Move> getMovesOfSelectedPiece(){
+        return movesOfSelectedPiece;
+    }
+
     @Override
     protected void paintComponent(Graphics g) {
         for (int y = 0; y < size; ++y) {
@@ -287,6 +293,8 @@ public class Board extends JPanel implements MouseListener {
                 if (clicked.getPiece().getColourAsString().equals("White") && whiteTurn
                         || clicked.getPiece().getColourAsString().equals("Black") && !whiteTurn) {
                     this.clickedCellPosition = clickedPosition;
+                    movesOfSelectedPiece = clicked.getPiece().getPossibleMoves();
+                    repaint();
                 }
             }
         } else { // player clicked mouse when some cell is chosen
@@ -310,9 +318,12 @@ public class Board extends JPanel implements MouseListener {
                         || clicked.getPiece().getColourAsString().equals("Black") && !whiteTurn) {
                     System.out.println("Mouse clicked to change component to move");
                     this.clickedCellPosition = clickedPosition;
+                    movesOfSelectedPiece = clicked.getPiece().getPossibleMoves();
+                    repaint();
                 }
             }
             if (isMoved || isMoved2) {
+                movesOfSelectedPiece = null;
                 repaint();
                 System.out.println("One of the components was moved");
                 setBoardAltered(true); // sets board status as altered

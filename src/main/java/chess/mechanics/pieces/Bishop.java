@@ -19,6 +19,6 @@ public class Bishop extends Piece {
     }
 
     protected ArrayList<Move> getPossibleMoves() {
-        return getDiagonalMoves();
+        return removeMovesThatLeadToCheck(getDiagonalMoves());
     }
 }

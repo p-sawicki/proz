@@ -57,6 +57,15 @@ public abstract class Piece {
                 }
             }
         }
+        return removeMovesThatLeadToCheck(possibleMoves);
+    }
+
+    protected ArrayList<Move> removeMovesThatLeadToCheck(ArrayList<Move> moves){
+        ArrayList<Move> possibleMoves = new ArrayList<>();
+        for(Move move : moves){
+            if(!CheckDetector.isPlayerChecked(cell.getBoard(), move))
+                possibleMoves.add(move);
+        }
         return possibleMoves;
     }
 
@@ -139,7 +148,7 @@ public abstract class Piece {
 
     public boolean isAppropriateMove(Cell destination) { //checks if piece selected by player can be moved to selected cell
         for (Move move : getMoves())
-            if (move.after.x == destination.getPosition().x && move.after.y == destination.getPosition().y && !CheckDetector.isPlayerChecked(cell.getBoard(), move))
+            if (move.after.x == destination.getPosition().x && move.after.y == destination.getPosition().y)
                 return true;
         return false;
     }
