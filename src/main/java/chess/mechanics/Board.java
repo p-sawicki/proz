@@ -91,7 +91,7 @@ public class Board extends JPanel implements MouseListener {
         if (piece != null) {
             cell.setPiece(piece.copy());
             if (piece instanceof King) {
-                setKing((King)cell.getPiece());
+                setKing((King) cell.getPiece());
             }
         }
     }
@@ -236,7 +236,7 @@ public class Board extends JPanel implements MouseListener {
             move.promotion = Move.Promotion.rook;
         else
             move.promotion = Move.Promotion.bishop;
-        if(connectionHandler != null)
+        if (connectionHandler != null)
             connectionHandler.send(new Message(move, state, Message.MessageType.move));
         waitOnPromotion = false;
     }
@@ -393,8 +393,22 @@ public class Board extends JPanel implements MouseListener {
         return colour == Cell.Colour.white ? lastDoubleStepWhite : lastDoubleStepBlack;
     }
 
-    public Piece getPiece(int x, int y){
+    public Piece getPiece(int x, int y) {
         return cells[y][x].getPiece();
+    }
+
+    public Point getLastDoubleStepPosition(Cell.Colour colour) {
+        if (colour == Cell.Colour.white)
+            return lastDoubleStepWhite == null ? nullPosition : lastDoubleStepWhite.getCell().getPosition();
+        else
+            return lastDoubleStepBlack == null ? nullPosition : lastDoubleStepBlack.getCell().getPosition();
+    }
+
+    public void setLastDoubleStep(Point blackPosition, Point whitePosition) {
+        if (!blackPosition.equals(nullPosition))
+            lastDoubleStepBlack = (Pawn) cells[blackPosition.y][blackPosition.x].getPiece();
+        if (!whitePosition.equals(nullPosition))
+            lastDoubleStepWhite = (Pawn) cells[whitePosition.y][whitePosition.x].getPiece();
     }
 
     public void setBoardAltered(boolean isAltered) {
@@ -405,15 +419,15 @@ public class Board extends JPanel implements MouseListener {
         for (int y = 0; y < size; ++y) {
             for (int x = 0; x < size; ++x) {
                 cells[y][x].setPiece(pieces[y][x]);
-                if(pieces[y][x] instanceof King){
+                if (pieces[y][x] instanceof King) {
                     setKing((King) pieces[y][x]);
                 }
             }
         }
     }
 
-    public void setKing(King king){
-        if(king.getColour() == Cell.Colour.white)
+    public void setKing(King king) {
+        if (king.getColour() == Cell.Colour.white)
             whiteKing = king;
         else
             blackKing = king;
