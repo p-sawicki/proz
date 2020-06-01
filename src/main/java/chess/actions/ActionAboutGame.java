@@ -16,7 +16,6 @@ public class ActionAboutGame implements ActionListener {
         final JFrame descriptionWindow = new JFrame("About program");
 
         ImageIcon icon = new ImageIcon(Utility.getResourcePath() + "gameLogo.png");
-        System.out.println("Trying to get game logo at: " + Utility.getResourcePath() + "gameLogo.png");
         JOptionPane.showMessageDialog(descriptionWindow,
                 getGameDescription(),
                 "About program",

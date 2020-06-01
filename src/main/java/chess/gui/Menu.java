@@ -56,9 +56,7 @@ public class Menu implements Runnable {
         newGameButton.addActionListener(new ActionNewGame(this));
         loadGameButton.addActionListener(new ActionOpen(this));
         aboutGameButton.addActionListener(new ActionAboutGame());
-        quitGameButton.addActionListener(e -> {
-            System.exit(0);
-        });
+        quitGameButton.addActionListener(e -> System.exit(0));
 
         // initialize button panel
         JPanel buttonPanel = new JPanel();
@@ -87,6 +85,6 @@ public class Menu implements Runnable {
     }
 
     public MenuConnectionHandler getMenuConnectionHandler() {
-        return this.menuConnectionHandler;
+        return menuConnectionHandler;
     }
 }

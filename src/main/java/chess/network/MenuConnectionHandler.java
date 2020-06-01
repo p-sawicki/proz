@@ -7,26 +7,19 @@ import chess.utilities.GameAttributes;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
-import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.SocketTimeoutException;
 
-public class MenuConnectionHandler extends Thread {
-    private final int port = 6969;
+public class MenuConnectionHandler extends ConnectionHandlerBase {
+    private final String challenge = "C";
+    private final String accepted = "A";
+    private final String declined = "D";
+    private final String black = "B";
     private final Menu menu;
-    private boolean running;
-    private ServerSocket serverSocket;
     private Multiplayer multiplayer;
 
     public MenuConnectionHandler(Menu menu) {
         this.menu = menu;
-        running = false;
-        try {
-            serverSocket = new ServerSocket(port);
-            serverSocket.setSoTimeout(1000);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
         this.multiplayer = new Multiplayer(menu);
     }
 
@@ -41,13 +34,13 @@ public class MenuConnectionHandler extends Thread {
                 String opponentAddress = incomingConnection.getInetAddress().getHostAddress();
                 incomingConnection.close();
                 switch (message[0]) {
-                    case "C":
+                    case challenge:
                         multiplayer.onOpponentChallenge(message[1], opponentAddress);
                         break;
-                    case "A":
-                        multiplayer.onChallengeAccepted(message[1].equals("B") ? Cell.Colour.black : Cell.Colour.white, opponentAddress, message[2]);
+                    case accepted:
+                        multiplayer.onChallengeAccepted(message[1].equals(black) ? Cell.Colour.black : Cell.Colour.white, opponentAddress, message[2]);
                         break;
-                    case "D":
+                    case declined:
                         multiplayer.onChallengeDeclined();
                         break;
                 }
@@ -60,7 +53,7 @@ public class MenuConnectionHandler extends Thread {
 
     private void sendMessage(String opponentAddress, String message) {
         try {
-            Socket socket = new Socket(opponentAddress, port);
+            Socket socket = new Socket(opponentAddress, peerPort);
             DataOutputStream dataOutputStream = new DataOutputStream(socket.getOutputStream());
             dataOutputStream.writeUTF(message);
             socket.close();
@@ -70,33 +63,16 @@ public class MenuConnectionHandler extends Thread {
     }
 
     public void challenge(String myName, String opponentAddress, GameAttributes gameAttributes) {
-        sendMessage(opponentAddress, "C " + myName);
+        sendMessage(opponentAddress, challenge + " " + myName);
         this.multiplayer = new Multiplayer(this.menu, gameAttributes);
     }
 
     public void accept(String opponentAddress, Cell.Colour colour, String myName) {
-        sendMessage(opponentAddress, "A " + (colour == Cell.Colour.black ? "B" : "W") + " " + myName);
+        final String white = "W";
+        sendMessage(opponentAddress, accepted + " " + (colour == Cell.Colour.black ? black : white) + " " + myName);
     }
 
     public void decline(String opponentAddress) {
-        sendMessage(opponentAddress, "D");
-    }
-
-    public void stopReceiving() {
-        running = false;
-        try {
-            serverSocket.close();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
-    public void resumeReceiving() {
-        running = true;
-        try {
-            serverSocket = new ServerSocket(port);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        sendMessage(opponentAddress, declined);
     }
 }

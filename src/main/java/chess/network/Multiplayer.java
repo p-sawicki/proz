@@ -10,9 +10,9 @@ import java.awt.*;
 import java.util.Random;
 
 public class Multiplayer {
-    private Menu menu;
-    private GameAttributes gameAttributes;
-    private JLabel spacerLabel;
+    private final Menu menu;
+    private final GameAttributes gameAttributes;
+    private final JLabel spacerLabel;
     private JFrame gameParametersWindow;
 
     public Multiplayer(Menu menu) {
@@ -35,13 +35,14 @@ public class Multiplayer {
         challengeWindow.setVisible(true);
         challengeWindow.setLayout(new GridLayout(3, 2));
 
+        JTextField nameField = new JTextField();
+        JButton acceptButton = new JButton("Accept");
+        JButton declineButton = new JButton("Decline");
+
         challengeWindow.add(new JLabel("  You've been challenged to a game!"));
         challengeWindow.add(new JLabel("Opponent name: " + opponentName + " IP: " + opponentAddress));
         challengeWindow.add(new JLabel("  Enter your name to accept:  "));
-        JTextField nameField = new JTextField();
         challengeWindow.add(nameField);
-        JButton acceptButton = new JButton("Accept");
-        JButton declineButton = new JButton("Decline");
         challengeWindow.add(acceptButton);
         challengeWindow.add(declineButton);
         challengeWindow.pack();

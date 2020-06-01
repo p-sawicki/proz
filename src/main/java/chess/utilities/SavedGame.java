@@ -7,25 +7,22 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class SavedGame {
-    private String programVersion = "1.0"; // in case modified program won't support old files
-    private String playerName;
-    private boolean whiteTurn;
-    private List<SavedCell> cellsList;
-    //private GameStatus status;
-
-    //public enum GameStatus {x, checkmate}
+    private final String programVersion = "1.0"; // in case modified program won't support old files
+    private final String playerName;
+    private final boolean whiteTurn;
+    private final List<SavedCell> cellsList;
 
     public SavedGame(GameWindow gameWindow) {
         Board board = gameWindow.getBoard();
-        this.cellsList = new ArrayList<SavedCell>();
+        cellsList = new ArrayList<>();
 
         // initialize saved Game values
-        this.playerName = gameWindow.getPlayerName();
-        this.whiteTurn = board.getWhiteTurn();
+        playerName = gameWindow.getPlayerName();
+        whiteTurn = board.getWhiteTurn();
 
         // initialize list of cells
         Cell[][] cells = board.getCells();
-        int size = 8; // number of rows and columns
+        int size = board.getBoardSize(); // number of rows and columns
         Cell realCell;
         for (int y = size - 1; y >= 0; --y) {
             for (int x = 0; x < size; ++x) {

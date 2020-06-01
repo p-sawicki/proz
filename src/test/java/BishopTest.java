@@ -12,7 +12,10 @@ public class BishopTest extends TestCase {
         Piece[][] pieces = BoardSetup.getEmptyPieces();
         Point start = board.getCells()[3][3].getPosition();
         pieces[start.y][start.x] = new Bishop(Cell.Colour.black);
+        pieces[0][0] = new King(Cell.Colour.white);
+        pieces[0][2] = new King(Cell.Colour.black);
         board.setPieces(pieces);
+
 
         ArrayList<Move> expectedMoves = new ArrayList<>();
         expectedMoves.add(new Move(start, board.getCells()[2][2].getPosition()));
@@ -31,7 +34,7 @@ public class BishopTest extends TestCase {
 
         ArrayList<Move> moves = pieces[start.y][start.x].getMoves();
         assert moves.size() == expectedMoves.size();
-        for(int i = 0; i < moves.size(); ++i){
+        for (int i = 0; i < moves.size(); ++i) {
             assert moves.get(i).after.x == expectedMoves.get(i).after.x;
             assert moves.get(i).after.y == expectedMoves.get(i).after.y;
         }

@@ -42,10 +42,7 @@ public class ActionOpen implements ActionListener {
         if (returnValue == JFileChooser.APPROVE_OPTION) {
             File selectedFile = jfc.getSelectedFile();
             String fileName = selectedFile.getAbsolutePath();
-            System.out.println("player has chosen saved game at: " + fileName);
-
             SavedGame savedGame = createSavedGameFromXml(fileName);
-
             GameAttributes savedGameAttr = savedGame.createGameAttributes();
             resumeSavedGame(savedGameAttr);
         }
@@ -53,21 +50,17 @@ public class ActionOpen implements ActionListener {
 
     public SavedGame createSavedGameFromXml(String fileName) {
         XStream xstream = new XStream();
-
         String savedXmlGame = "";
         try {
             savedXmlGame = new String(Files.readAllBytes(Paths.get(fileName)));
-            //System.out.println( savedXmlGame );
         } catch (IOException e) {
             e.printStackTrace();
         }
-
         return (SavedGame) xstream.fromXML(savedXmlGame);
     }
 
-    public void resumeSavedGame(GameAttributes savedGameAttributes) { // resumes saved game
+    public void resumeSavedGame(GameAttributes savedGameAttributes) {
         JFrame gameParametersWindow = Utility.createGameParametersWindow(2, 2);
-
         // window objects
         JLabel enterNameLabel = new JLabel("  Your name:");
         JLabel nameField = new JLabel(savedGameAttributes.getPlayerName());

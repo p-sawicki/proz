@@ -6,13 +6,14 @@ import java.util.ArrayList;
 
 public class Bishop extends Piece {
     public Bishop(Cell.Colour colour) {
-        super(colour);
+        this(colour, false);
     }
 
     public Bishop(Cell.Colour colour, boolean hasMoved) {
         super(colour, hasMoved);
     }
 
+    @Override
     public Piece copy() {
         return new Bishop(colour);
     }
@@ -22,6 +23,7 @@ public class Bishop extends Piece {
         return "Bishop";
     }
 
+    @Override
     protected ArrayList<Move> getPossibleMoves() {
         return removeMovesThatLeadToCheck(getDiagonalMoves());
     }
