@@ -44,6 +44,7 @@ public class Multiplayer {
         JButton declineButton = new JButton("Decline");
         challengeWindow.add(acceptButton);
         challengeWindow.add(declineButton);
+        challengeWindow.pack();
 
         acceptButton.addActionListener(e -> {
             String playerName = nameField.getText();

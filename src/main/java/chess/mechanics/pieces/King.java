@@ -47,7 +47,7 @@ public class King extends Piece {
             moves.add(castle);
         }
         piece = cell.getBoard().getCells()[y][cell.getBoard().getBoardSize() - 1].getPiece();
-        if (!hasMoved && piece instanceof Rook && piece.getColour() == Cell.Colour.white && !piece.getHasMoved()
+        if (!hasMoved && piece instanceof Rook && piece.getColour() == colour && !piece.getHasMoved()
                 && !cell.getBoard().getCells()[y][x + 1].getOccupation()
                 && !CheckDetector.isPlayerChecked(cell.getBoard(), new Move(start, start))
                 && !CheckDetector.isPlayerChecked(cell.getBoard(), new Move(start, new Point(x + 1, y)))) {
