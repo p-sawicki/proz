@@ -9,6 +9,10 @@ public class Bishop extends Piece {
         super(colour);
     }
 
+    public Bishop(Cell.Colour colour, boolean hasMoved) {
+        super(colour, hasMoved);
+    }
+
     public Piece copy() {
         return new Bishop(colour);
     }
