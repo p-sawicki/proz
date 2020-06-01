@@ -26,7 +26,6 @@ public class Board extends JPanel implements MouseListener {
     private final Point nullPosition = new Point(-1, -1);
     private King whiteKing;
     private King blackKing;
-    private ArrayList<Move> movesOfSelectedPiece;
     private Pawn lastDoubleStepBlack;
     private Pawn lastDoubleStepWhite;
     private volatile boolean waitOnPromotion;
@@ -250,10 +249,6 @@ public class Board extends JPanel implements MouseListener {
         }
     }
 
-    public ArrayList<Move> getMovesOfSelectedPiece() {
-        return movesOfSelectedPiece;
-    }
-
     public Pawn getLastDoubleStep(Cell.Colour colour) {
         return colour == Cell.Colour.white ? lastDoubleStepWhite : lastDoubleStepBlack;
     }
@@ -394,7 +389,7 @@ public class Board extends JPanel implements MouseListener {
                 if (clicked.getPiece().getColourAsString().equals("White") && whiteTurn
                         || clicked.getPiece().getColourAsString().equals("Black") && !whiteTurn) {
                     this.clickedCellPosition = clickedPosition;
-                    movesOfSelectedPiece = clicked.getPiece().getPossibleMoves();
+                    highlight(clicked.getPiece().getPossibleMoves());
                     repaint();
                 }
             }
@@ -428,12 +423,12 @@ public class Board extends JPanel implements MouseListener {
                         || clicked.getPiece().getColourAsString().equals("Black") && !whiteTurn) {
                     System.out.println("Mouse clicked to change component to move");
                     this.clickedCellPosition = clickedPosition;
-                    movesOfSelectedPiece = clicked.getPiece().getPossibleMoves();
+                    highlight(clicked.getPiece().getPossibleMoves());
                     repaint();
                 }
             }
             if (isMoved || isMoved2) {
-                movesOfSelectedPiece = null;
+                resetHighlight();
                 repaint();
                 System.out.println("One of the components was moved");
                 setBoardAltered(true); // sets board status as altered
@@ -468,6 +463,19 @@ public class Board extends JPanel implements MouseListener {
             }
         }
         repaint();
+    }
+
+    private void highlight(ArrayList<Move> movesOfSelectedPiece){
+        resetHighlight();
+        for(Move move : movesOfSelectedPiece){
+            cells[move.after.y][move.after.x].highlight(true);
+        }
+    }
+    private void resetHighlight(){
+        for(Cell[] cellRow : cells){
+            for(Cell cell : cellRow)
+                cell.highlight(false);
+        }
     }
 
     // this function is invoked when the mouse enters a component
