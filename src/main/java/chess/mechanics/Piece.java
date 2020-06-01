@@ -146,7 +146,7 @@ public abstract class Piece {
         return possibleMoves;
     }
 
-    private File getImageFile() {
+    public File getImageFile() {
         return new File(Utility.getResourcePath() + getColourAsString() + getName() + ".png");
     }
 
