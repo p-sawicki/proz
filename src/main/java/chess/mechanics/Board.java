@@ -334,6 +334,8 @@ public class Board extends JPanel implements MouseListener {
         int posY = clickedPosition.y;
         System.out.println("Mouse clicked on the component " + clicked.getPieceNameColor() + " | posX = " + posX + ", posY = " + posY);
 
+        Point previousClickedCell = this.clickedCellPosition;
+
         if (clickedCellPosition.equals(nullPosition)) { //player hasn't chosen cell to move yet
             if (clicked.getOccupation()) {
                 System.out.println("Mouse clicked to choose component");
@@ -344,7 +346,7 @@ public class Board extends JPanel implements MouseListener {
                     repaint();
                 }
             }
-        } else { // player clicked mouse when some cell is chosen
+        } else { // player clicked mouse when some cell chosen
             int prevX = clickedCellPosition.x;
             int prevY = clickedCellPosition.y;
             Piece piece = cells[prevY][prevX].getPiece();
@@ -359,14 +361,14 @@ public class Board extends JPanel implements MouseListener {
                 System.out.println("Mouse clicked to move component to vacant cell");
 
                 isMoved = moveIfPossible(move); //movePiece from clickedCell to clicked
-                this.clickedCellPosition = nullPosition;
+                this.clickedCellPosition = previousClickedCell;
             }
             if (clicked.getOccupation()) {
                 if (clicked.getPiece().getColourAsString().equals("White") && !whiteTurn
                         || clicked.getPiece().getColourAsString().equals("Black") && whiteTurn) {
                     System.out.println("Mouse clicked to beat component");
                     isMoved2 = moveIfPossible(move); //beat clicked with clickedCell
-                    this.clickedCellPosition = nullPosition;
+                    this.clickedCellPosition = previousClickedCell;
                 }
                 if (clicked.getPiece().getColourAsString().equals("White") && whiteTurn
                         || clicked.getPiece().getColourAsString().equals("Black") && !whiteTurn) {

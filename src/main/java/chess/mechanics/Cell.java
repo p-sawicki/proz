@@ -3,6 +3,7 @@ package chess.mechanics;
 import chess.mechanics.pieces.*;
 
 import javax.swing.*;
+import javax.swing.border.LineBorder;
 import java.awt.*;
 import java.util.ArrayList;
 
@@ -93,15 +94,20 @@ public class Cell extends JComponent {
 
     public void paint(Graphics g) {
         super.paintComponent(g);
+        super.paintBorder(g);
 
-        if (isHighlighted())
-            g.setColor(new Color(25, 243, 124));
-        else {
-            if (colour == Colour.white)
-                g.setColor(new Color(221, 192, 127));
-            else
-                g.setColor(new Color(85, 76, 76));
+        // cell border
+        if (isHighlighted()) {
+            setBorder(new LineBorder(new Color(255, 248, 210), 5));
+        } else {
+            setBorder(new LineBorder(Color.black, 0));
         }
+
+        // cell colour
+        if (colour == Colour.white)
+            g.setColor(new Color(221, 192, 127));
+        else
+            g.setColor(new Color(85, 76, 76));
 
         g.fillRect(getX(), getY(), getWidth(), getHeight());
         if (piece != null)
