@@ -17,6 +17,10 @@ public abstract class Piece {
     protected boolean hasMoved;
 
     public Piece(Cell.Colour colour) {
+        this(colour, false);
+    }
+
+    public Piece(Cell.Colour colour, boolean hasMoved) {
         this.colour = colour;
         try {
             image = ImageIO.read(getImageFile());
@@ -24,7 +28,7 @@ public abstract class Piece {
             System.out.println("Could not open image: " + e.getMessage());
         }
         possibleMoves = new ArrayList<>();
-        hasMoved = false;
+        this.hasMoved = hasMoved;
     }
 
     public abstract Piece copy();
@@ -154,6 +158,10 @@ public abstract class Piece {
 
     public void hasMoved(){
         hasMoved = true;
+    }
+
+    public void hasNotMoved() {
+        hasMoved = false;
     }
 
     public boolean isAppropriateMove(Cell destination) { //checks if piece selected by player can be moved to selected cell

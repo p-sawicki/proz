@@ -39,25 +39,25 @@ public class Cell extends JComponent {
             piece.setCell(this);
     }
 
-    public void setPiece(String pieceType, Cell.Colour pieceColour) {
+    public void setPiece(String pieceType, Cell.Colour pieceColour, boolean hasMoved) {
         switch (pieceType) {
             case "Pawn":
-                this.piece = new Pawn(pieceColour);
+                this.piece = new Pawn(pieceColour, hasMoved);
                 break;
             case "Knight":
-                this.piece = new Knight(pieceColour);
+                this.piece = new Knight(pieceColour, hasMoved);
                 break;
             case "King":
-                this.piece = new King(pieceColour);
+                this.piece = new King(pieceColour, hasMoved);
                 break;
             case "Bishop":
-                this.piece = new Bishop(pieceColour);
+                this.piece = new Bishop(pieceColour, hasMoved);
                 break;
             case "Queen":
-                this.piece = new Queen(pieceColour);
+                this.piece = new Queen(pieceColour, hasMoved);
                 break;
             case "Rook":
-                this.piece = new Rook(pieceColour);
+                this.piece = new Rook(pieceColour, hasMoved);
                 break;
         }
     }

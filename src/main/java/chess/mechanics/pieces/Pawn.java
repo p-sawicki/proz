@@ -12,6 +12,10 @@ public class Pawn extends Piece {
         super(colour);
     }
 
+    public Pawn(Cell.Colour colour, boolean hasMoved) {
+        super(colour, hasMoved);
+    }
+
     public Piece copy() {
         return new Pawn(colour);
     }

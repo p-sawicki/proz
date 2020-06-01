@@ -9,6 +9,10 @@ public class Queen extends Piece {
         super(colour);
     }
 
+    public Queen(Cell.Colour colour, boolean hasMoved) {
+        super(colour, hasMoved);
+    }
+
     public Piece copy() {
         return new Queen(colour);
     }

@@ -166,8 +166,15 @@ public class Board extends JPanel implements MouseListener {
                 add(cell);
 
                 Piece piece = cells[y][x].getPiece();
-                if (piece != null)
+                if (piece != null) {
                     this.cells[y][x].setPiece(piece.copy());
+                    if (this.cells[y][x].getPiece() instanceof King) {
+                        if (this.cells[y][x].getPiece().getColour() == Cell.Colour.white)
+                            whiteKing = (King) this.cells[y][x].getPiece();
+                        else
+                            blackKing = (King) this.cells[y][x].getPiece();
+                    }
+                }
 
                 if (x != size - 1)
                     color = color == Cell.Colour.black ? Cell.Colour.white : Cell.Colour.black;

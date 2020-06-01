@@ -10,6 +10,10 @@ public class King extends Piece {
         super(colour);
     }
 
+    public King(Cell.Colour colour, boolean hasMoved) {
+        super(colour, hasMoved);
+    }
+
     public Piece copy() {
         return new King(colour);
     }

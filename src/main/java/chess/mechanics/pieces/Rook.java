@@ -9,6 +9,10 @@ public class Rook extends Piece {
         super(colour);
     }
 
+    public Rook(Cell.Colour colour, boolean hasMoved) {
+        super(colour, hasMoved);
+    }
+
     public Piece copy() {
         return new Rook(colour);
     }
