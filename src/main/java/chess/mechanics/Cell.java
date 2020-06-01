@@ -12,6 +12,7 @@ public class Cell extends JComponent {
     private Piece piece;
     protected Board board;
     private final Point position;
+    private boolean highlighted;
 
     public enum Colour {white, black}
 
@@ -95,16 +96,9 @@ public class Cell extends JComponent {
     public void paint(Graphics g) {
         super.paintComponent(g);
         super.paintBorder(g);
-
-        // cell border
-        if (isHighlighted()) {
-            setBorder(new LineBorder(new Color(255, 248, 210), 5));
-        } else {
-            setBorder(new LineBorder(Color.black, 0));
-        }
-
-        // cell colour
-        if (colour == Colour.white)
+        if(highlighted)
+            g.setColor(new Color(109, 241, 82));
+        else if (colour == Colour.white)
             g.setColor(new Color(221, 192, 127));
         else
             g.setColor(new Color(85, 76, 76));
@@ -114,14 +108,7 @@ public class Cell extends JComponent {
             piece.draw(g);
     }
 
-    private boolean isHighlighted() {
-        ArrayList<Move> moves = board.getMovesOfSelectedPiece();
-        if (moves != null) {
-            for (Move move : moves) {
-                if (move.after.y == position.y && move.after.x == position.x)
-                    return true;
-            }
-        }
-        return false;
+    public void highlight(boolean highlight){
+        highlighted = highlight;
     }
 }
