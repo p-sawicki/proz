@@ -3,6 +3,7 @@ package chess.utilities;
 import chess.gui.GameWindow;
 import chess.mechanics.*;
 
+import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -11,6 +12,8 @@ public class SavedGame {
     private final String playerName;
     private final boolean whiteTurn;
     private final List<SavedCell> cellsList;
+    private final Point lastBlackPosition;
+    private final Point lastWhitePosition;
 
     public SavedGame(GameWindow gameWindow) {
         Board board = gameWindow.getBoard();
@@ -31,6 +34,9 @@ public class SavedGame {
                 cellsList.add(savedCell);
             }
         }
+
+        lastBlackPosition = board.getLastDoubleStepPosition(Cell.Colour.black);
+        lastWhitePosition = board.getLastDoubleStepPosition(Cell.Colour.white);
     }
 
     public Board restoreBoard() {
@@ -46,7 +52,9 @@ public class SavedGame {
             }
         }
 
-        return new Board(cells, this.whiteTurn, true);
+        Board board = new Board(cells, this.whiteTurn, true);
+        board.setLastDoubleStep(lastBlackPosition, lastWhitePosition);
+        return board;
     }
 
     public GameAttributes createGameAttributes() {
