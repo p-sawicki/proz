@@ -10,33 +10,29 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-//import java.time.LocalDateTime;
 
 public class GameWindow {
-    private JFrame window;
-    private Board board;
+    private final Board board;
     private String playerName;
     private String opponentName;
-    private ConnectionHandler connectionHandler;
+    private final ConnectionHandler connectionHandler;
 
     public GameWindow(GameAttributes gameAttributes) {
-        window = new JFrame("Chess");
+        JFrame window = new JFrame("Chess");
         window.setLayout(new BorderLayout(10, 10));
 
-        this.connectionHandler = gameAttributes.getConnectionHandler();
+        connectionHandler = gameAttributes.getConnectionHandler();
         if (connectionHandler != null)
             connectionHandler.setGameWindow(window);
+        if (gameAttributes.getBoard() != null)
+            board = gameAttributes.getBoard();
+        else
+            board = new Board(gameAttributes.getPlayerColour(), gameAttributes.getConnectionHandler());
 
-        if (gameAttributes.getBoard() != null) {
-            this.board = gameAttributes.getBoard();
-        } else {
-            this.board = new Board(gameAttributes.getPlayerColour(), gameAttributes.getConnectionHandler());
-        }
         setPlayerName(gameAttributes.getPlayerName());
         setOpponentName(gameAttributes.getOpponentName());
 
-        window.add(this.board, BorderLayout.CENTER);
-
+        window.add(board, BorderLayout.CENTER);
         window.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
         window.addWindowListener(new WindowAdapter() {
             @Override
@@ -48,7 +44,6 @@ public class GameWindow {
             }
         });
         window.setVisible(true);
-
         initializeGameMenuBar(window);
         window.pack();
     }
@@ -57,15 +52,16 @@ public class GameWindow {
         // Menu buttons
         final JMenuItem goBackToMenuButton = new JMenuItem("Go to menu");
         final JMenuItem saveGameButton = new JMenuItem("Save game");
-        saveGameButton.setAccelerator(KeyStroke.getKeyStroke("ctrl S"));
         final JMenuItem quitGameButton = new JMenuItem("Quit game");
+
+        saveGameButton.setAccelerator(KeyStroke.getKeyStroke("ctrl S"));
         quitGameButton.setAccelerator(KeyStroke.getKeyStroke("ctrl Q"));
+
         final JLabel playerNameLabel;
-        if (board.checkIfSinglePlayer()) {
+        if (board.checkIfHotSeat())
             playerNameLabel = new JLabel("  |  " + playerName + "  ");
-        } else {
+        else
             playerNameLabel = new JLabel("  |  " + playerName + " vs " + opponentName + "  ");
-        }
 
         // buttons' listeners
         goBackToMenuButton.addActionListener(e -> {
@@ -86,7 +82,7 @@ public class GameWindow {
         // Menu bar in game
         JMenuBar menuBar = new JMenuBar();
         menuBar.add(goBackToMenuButton);
-        if (isSinglePlayer())
+        if (isHotSeat())
             menuBar.add(saveGameButton);
         menuBar.add(quitGameButton);
         menuBar.add(playerNameLabel);
@@ -94,11 +90,11 @@ public class GameWindow {
     }
 
     public boolean checkIfSaveIsPossible() {
-        return board.checkIfBoardAltered() && isSinglePlayer();
+        return board.checkIfBoardAltered() && isHotSeat();
     }
 
-    public boolean isSinglePlayer() {
-        return board.checkIfSinglePlayer();
+    public boolean isHotSeat() {
+        return board.checkIfHotSeat();
     }
 
     // getters
@@ -124,8 +120,8 @@ public class GameWindow {
     }
 
     public void quitProcedure() {
-        if (!isSinglePlayer() && connectionHandler != null) {
-            Message message = new Message("Q");
+        if (!isHotSeat() && connectionHandler != null) {
+            Message message = new Message(Message.MessageType.quit);
             connectionHandler.send(message);
             connectionHandler.stopReceiving();
         }

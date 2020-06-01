@@ -9,28 +9,35 @@ public class CheckDetectorTest extends TestCase {
 
         assert !CheckDetector.isPlayerChecked(board, Cell.Colour.black);
         assert !CheckDetector.isPlayerChecked(board, Cell.Colour.white);
-        assert CheckDetector.isOpponentChecked(board, Cell.Colour.black) == CheckDetector.State.none;
-        assert CheckDetector.isOpponentChecked(board, Cell.Colour.white) == CheckDetector.State.none;
+        assert CheckDetector.getOpponentsState(board, Cell.Colour.black) == CheckDetector.State.none;
+        assert CheckDetector.getOpponentsState(board, Cell.Colour.white) == CheckDetector.State.none;
     }
 
     public void testCheck(){
-        Board board = BoardSetup.getEmptyBoard(Cell.Colour.black);
-        board.getCells()[0][0].setPiece(new Knight(Cell.Colour.white));
-        board.getCells()[1][2].setPiece(new King(Cell.Colour.black));
+        Piece[][] pieces = BoardSetup.getEmptyPieces();
+        pieces[0][0] = new Knight(Cell.Colour.white);
+        pieces[1][2] = new King(Cell.Colour.black);
+        Board board = new Board(Cell.Colour.black, null);
+        board.setPieces(pieces);
         assert CheckDetector.isPlayerChecked(board, Cell.Colour.black);
-        assert CheckDetector.isOpponentChecked(board, Cell.Colour.white) == CheckDetector.State.check;
+        assert CheckDetector.getOpponentsState(board, Cell.Colour.white) == CheckDetector.State.check;
     }
 
     public void testCheckMate(){
-        Board board = BoardSetup.getEmptyBoard(Cell.Colour.white);
-        board.getCells()[0][0].setPiece(new King(Cell.Colour.white));
-        board.getCells()[1][1].setPiece(new Pawn(Cell.Colour.black));
+        Piece[][] pieces = BoardSetup.getEmptyPieces();
+        pieces[0][0] = new King(Cell.Colour.white);
+        pieces[1][1] = new Pawn(Cell.Colour.black);
+        pieces[6][6] = new King(Cell.Colour.black);
+        Board board = new Board(Cell.Colour.white, null);
+        board.setPieces(pieces);
         assert CheckDetector.isPlayerChecked(board, Cell.Colour.white);
-        assert CheckDetector.isOpponentChecked(board, Cell.Colour.black) == CheckDetector.State.check;
+        assert CheckDetector.getOpponentsState(board, Cell.Colour.black) == CheckDetector.State.check;
 
-        board.getCells()[7][0].setPiece(new Rook(Cell.Colour.black));
-        board.getCells()[0][7].setPiece(new Rook(Cell.Colour.black));
-        board.getCells()[7][7].setPiece(new Bishop(Cell.Colour.black));
-        assert CheckDetector.isOpponentChecked(board, Cell.Colour.black) == CheckDetector.State.checkmate;
+        pieces[7][0] = new Rook(Cell.Colour.black);
+        pieces[0][7] = new Rook(Cell.Colour.black);
+        pieces[7][7] = new Bishop(Cell.Colour.black);
+        board = new Board(Cell.Colour.white, null);
+        board.setPieces(pieces);
+        assert CheckDetector.getOpponentsState(board, Cell.Colour.black) == CheckDetector.State.checkmate;
     }
 }

@@ -12,24 +12,14 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.SocketTimeoutException;
 
-public class ConnectionHandler extends Thread {
+public class ConnectionHandler extends ConnectionHandlerBase {
     private final String peerName;
-    private final int peerPort = 6970;
     private Board board;
-    private boolean running;
-    private ServerSocket serverSocket;
     private JFrame gameWindow;
 
     public ConnectionHandler(String peerName, Board board) {
-        this.peerName = peerName;
         this.board = board;
-        running = false;
-        try {
-            serverSocket = new ServerSocket(peerPort);
-            serverSocket.setSoTimeout(1000);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        this.peerName = peerName;
     }
 
     public void setBoard(Board board) {
@@ -57,11 +47,11 @@ public class ConnectionHandler extends Thread {
                 Message message = (Message) objectInputStream.readObject();
                 incomingConnection.close();
                 switch (message.messageType) {
-                    case "M":
+                    case move:
                         board.onMessageReceived(message);
                         break;
-                    case "Q":
-                        if (Utility.ignoredWarning("Your opponent quit game! Do you want to end game?")) {
+                    case quit:
+                        if (Utility.ignoredWarning("Your opponent has quit the game! Do you want to end the game?")) {
                             SwingUtilities.invokeLater(new Menu());
                             gameWindow.dispose();
                         }
@@ -71,24 +61,6 @@ public class ConnectionHandler extends Thread {
             } catch (Exception e) {
                 break;
             }
-        }
-    }
-
-    public void stopReceiving() {
-        running = false;
-        try {
-            serverSocket.close();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
-    public void resumeReceiving() {
-        running = true;
-        try {
-            serverSocket = new ServerSocket(peerPort);
-        } catch (Exception e) {
-            e.printStackTrace();
         }
     }
 

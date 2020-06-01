@@ -5,14 +5,13 @@ import chess.mechanics.*;
 import java.awt.*;
 
 public class SavedCell {
-    private String pieceType;
-    private Cell.Colour pieceColour;
-    private boolean pieceHasMoved;
-    private Point position;
+    private final String pieceType;
+    private final Cell.Colour pieceColour;
+    private final boolean pieceHasMoved;
+    private final Point position;
 
     SavedCell(Cell cell) {
         Piece piece = cell.getPiece();
-
         position = cell.getPosition();
         if (piece != null) {
             pieceType = piece.getName();
@@ -27,11 +26,8 @@ public class SavedCell {
 
     public Cell createCell() {
         Cell cell = new Cell(position);
-
-        if (!pieceType.equals("")) {
+        if (!pieceType.equals(""))
             cell.setPiece(pieceType, pieceColour, pieceHasMoved);
-        }
-
         return cell;
     }
 }
