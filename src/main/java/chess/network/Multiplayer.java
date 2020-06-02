@@ -60,8 +60,8 @@ public class Multiplayer {
             gameAttributes.setPlayerColour(myColour);
             menu.getMenuConnectionHandler().accept(opponentAddress, myColour == Cell.Colour.black ? Cell.Colour.white : Cell.Colour.black, gameAttributes.getPlayerName());
             gameAttributes.setConnectionHandler(new ConnectionHandler(opponentAddress, null));
-            new GameWindow(gameAttributes);
             menu.getMenuConnectionHandler().stopReceiving(); // stop receiving because player is in game
+            new GameWindow(gameAttributes);
             challengeWindow.dispose();
             menu.getMenuWindow().dispose();
         });
