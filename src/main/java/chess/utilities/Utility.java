@@ -6,11 +6,12 @@ import chess.mechanics.pieces.*;
 
 import javax.swing.*;
 import java.awt.*;
-import java.io.File;
+import java.net.URL;
 
 public class Utility {
-    public static String getResourcePath() {
-        return "src" + File.separator + "main" + File.separator + "resources" + File.separator;
+    public static URL getResourcePath(String filename) {
+        ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
+        return classLoader.getResource(filename);
     }
 
     public static JFrame createGameParametersWindow(int rows, int columns) {

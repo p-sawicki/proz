@@ -6,11 +6,8 @@ import chess.actions.ActionOpen;
 import chess.network.MenuConnectionHandler;
 import chess.utilities.Utility;
 
-import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
-import java.io.File;
-import java.io.IOException;
 
 public class Menu implements Runnable {
     private final int windowHeight = 720;
@@ -36,13 +33,8 @@ public class Menu implements Runnable {
     }
 
     private void setBackgroundImage(JFrame window) {
-        try {
-            window.setContentPane(
-                    new JLabel(new ImageIcon(ImageIO.read(new File(Utility.getResourcePath() + "menuBackground.png")))));
-        } catch (IOException e) {
-            System.out.println("Could not open image: " + e.getMessage());
-        }
-        ;
+        window.setContentPane(
+                new JLabel(new ImageIcon(Utility.getResourcePath("menuBackground.png"))));
     }
 
     private void addButtons(JFrame window) {
