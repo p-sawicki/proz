@@ -52,6 +52,7 @@ public class ConnectionHandler extends ConnectionHandlerBase {
                         break;
                     case quit:
                         if (Utility.ignoredWarning("Your opponent has quit the game! Do you want to end the game?")) {
+                            stopReceiving();
                             SwingUtilities.invokeLater(new Menu());
                             gameWindow.dispose();
                         }

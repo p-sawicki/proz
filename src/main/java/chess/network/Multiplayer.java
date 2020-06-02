@@ -59,9 +59,9 @@ public class Multiplayer {
             Cell.Colour myColour = (new Random()).nextInt(2) == 0 ? Cell.Colour.black : Cell.Colour.white;
             gameAttributes.setPlayerColour(myColour);
             menu.getMenuConnectionHandler().accept(opponentAddress, myColour == Cell.Colour.black ? Cell.Colour.white : Cell.Colour.black, gameAttributes.getPlayerName());
+            menu.getMenuConnectionHandler().stopReceiving(); // stop receiving because player is in game
             gameAttributes.setConnectionHandler(new ConnectionHandler(opponentAddress, null));
             new GameWindow(gameAttributes);
-            menu.getMenuConnectionHandler().stopReceiving(); // stop receiving because player is in game
             challengeWindow.dispose();
             menu.getMenuWindow().dispose();
         });
@@ -75,10 +75,10 @@ public class Multiplayer {
     public void onChallengeAccepted(Cell.Colour colour, String opponentAddress, String opponentName) {
         gameAttributes.setPlayerColour(colour);
         gameAttributes.setOpponentName(opponentName);
+        menu.getMenuConnectionHandler().stopReceiving();
         gameAttributes.setConnectionHandler(new ConnectionHandler(opponentAddress, null));
         gameParametersWindow.dispose();
         new GameWindow(this.gameAttributes);
-        menu.getMenuConnectionHandler().stopReceiving();
     }
 
     public void onChallengeDeclined() {
