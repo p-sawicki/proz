@@ -5,7 +5,6 @@ import chess.utilities.Utility;
 import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.image.BufferedImage;
-import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 
@@ -20,7 +19,7 @@ public abstract class Piece {
     public Piece(Cell.Colour colour, boolean hasMoved) {
         this.colour = colour;
         try {
-            image = ImageIO.read(getImageFile());
+            image = ImageIO.read(Utility.getResourcePath(getColourAsString() + getName() + ".png"));
         } catch (IOException e) {
             System.out.println("Could not open image: " + e.getMessage());
         }
@@ -153,10 +152,6 @@ public abstract class Piece {
         if (possibleMoves.isEmpty())
             possibleMoves = getPossibleMoves();
         return possibleMoves;
-    }
-
-    public File getImageFile() {
-        return new File(Utility.getResourcePath() + getColourAsString() + getName() + ".png");
     }
 
     public String getColourAsString() {
