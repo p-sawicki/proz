@@ -49,10 +49,10 @@ public class Pawn extends Piece {
 
     private void addSingleStep(ArrayList<Move> moves, int x, int y) {
         if (colour == Cell.Colour.black) {
-            if (findPiece(x, y - 1) == null)
+            if (y > 0 && findPiece(x, y - 1) == null)
                 moves.add(new Move(position, x, y - 1));
         } else {
-            if (findPiece(x, y + 1) == null)
+            if (y + 1 < getBoardSize() && findPiece(x, y + 1) == null)
                 moves.add(new Move(position, x, y + 1));
         }
     }
@@ -68,7 +68,7 @@ public class Pawn extends Piece {
     }
 
     private void addBeatStep(ArrayList<Move> moves, int x, int y) {
-        if (x >= 0 && x < getBoardSize()) {
+        if (x >= 0 && x < getBoardSize() && y >= 0 && y < getBoardSize()) {
             Piece piece = findPiece(x, y);
             if (piece != null && piece.getColour() != colour)
                 moves.add(new Move(position, x, y));
@@ -87,7 +87,7 @@ public class Pawn extends Piece {
 
     private void addEnPassantStep(ArrayList<Move> moves, int x, int y, int yMove) {
         Cell.Colour opponentColour = colour == Cell.Colour.black ? Cell.Colour.white : Cell.Colour.black;
-        if (x >= 0 && x < getBoardSize()) {
+        if (x >= 0 && x < getBoardSize() && y >= 0 && y < getBoardSize()) {
             Piece piece = findPiece(x, y);
             if (piece != null && piece.getColour() != colour && cell.getBoard().getLastDoubleStep(opponentColour) == piece) {
                 Move move = new Move(position, x, yMove);
